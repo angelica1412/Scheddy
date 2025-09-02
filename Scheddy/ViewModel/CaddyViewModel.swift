@@ -18,13 +18,13 @@ class CaddyStatusViewModel: ObservableObject {
     
     func loadDummyData() {
         caddies = [
-            Caddy(id: 1, name: "Aisyah Zahra", status: .onField),
-            Caddy(id: 2, name: "Hana Putri", status: .onField),
-            Caddy(id: 3, name: "Laila Salsabila", status: .onField),
-            Caddy(id: 4, name: "Maya Kartika", status: .onField),
-            Caddy(id: 5, name: "Rani Safira", status: .onField),
-            Caddy(id: 6, name: "Dinda Ayu", status: .onField),
-            Caddy(id: 7, name: "Citra Melati", status: .onField)
+            Caddy(id: 1, name: "Aisyah Zahra", status: .onField, group: "CADDY REQUEST"),
+            Caddy(id: 2, name: "Hana Putri", status: .standBy, group: "CADDY REQUEST"),
+            Caddy(id: 3, name: "Laila Salsabila", status: .onField, group: "Group 1"),
+            Caddy(id: 4, name: "Maya Kartika", status: .onField, group: "Group 2"),
+            Caddy(id: 5, name: "Rani Safira", status: .onField, group: "Group 1"),
+            Caddy(id: 6, name: "Dinda Ayu", status: .onField, group: "Group 2"),
+            Caddy(id: 7, name: "Citra Melati", status: .done, group: "Group 1")
         ]
     }
     
@@ -43,4 +43,7 @@ class CaddyStatusViewModel: ObservableObject {
     var filteredCaddies: [Caddy] {
         caddies.filter { $0.status == selectedStatus }
     }
+    var groupedCaddies: [String: [Caddy]] {
+        Dictionary(grouping: filteredCaddies, by: { $0.group })
+    } //buat nge grouping caddy nya
 }
