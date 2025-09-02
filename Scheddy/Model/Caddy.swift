@@ -11,6 +11,7 @@ struct Caddy: Identifiable, Codable {
     let id: Int
     let name: String
     let status: CaddyStatus
+    let group: String
 }
 
 enum CaddyStatus: String, Codable, CaseIterable {
