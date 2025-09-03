@@ -2,13 +2,11 @@
 //  Caddy.swift
 //  Scheddy
 //
-//  Created by Maria Angelica Vinesytha Chandrawan on 29/08/25.
+//  Created by Maria Angelica Vinesytha Chandrawan on 02/09/25.
 //
 
-import Foundation
-
 struct Caddy: Codable, Identifiable {
-    let id: Int
+    let id: String
     let name: String
-    let status: String? 
+    let status: String?
 }

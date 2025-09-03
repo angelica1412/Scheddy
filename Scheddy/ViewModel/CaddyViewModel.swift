@@ -7,40 +7,70 @@
 
 import Foundation
 
-@MainActor
+enum CaddyStatus: CaseIterable {
+    case onField, standBy, done
+}
+
 class CaddyStatusViewModel: ObservableObject {
-    @Published var caddies: [Caddy] = []
-    @Published var selectedStatus: CaddyStatus = .onField
+    @Published var groupedCaddies: [String: [Caddy]] = [:]
+    @Published var selectedStatus: CaddyStatus = .standBy
+    @Published var isLoading = false
+    @Published var errorMessage: String?
+    
+    private let service = CaddyService()
     
     init() {
-        loadDummyData() // sementara pakai dummy
+        loadCaddies()
     }
     
-    func loadDummyData() {
-        caddies = [
-            Caddy(id: 1, name: "Aisyah Zahra", status: .onField),
-            Caddy(id: 2, name: "Hana Putri", status: .onField),
-            Caddy(id: 3, name: "Laila Salsabila", status: .onField),
-            Caddy(id: 4, name: "Maya Kartika", status: .onField),
-            Caddy(id: 5, name: "Rani Safira", status: .onField),
-            Caddy(id: 6, name: "Dinda Ayu", status: .onField),
-            Caddy(id: 7, name: "Citra Melati", status: .onField)
-        ]
-    }
-    
-    // API Call → nanti tinggal ganti endpoint sesuai backend
-    func fetchFromAPI() async {
-        guard let url = URL(string: "https://api.yourbackend.com/caddies") else { return }
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            let decoded = try JSONDecoder().decode([Caddy].self, from: data)
-            caddies = decoded
-        } catch {
-            print("Error fetching data: \(error)")
+    func loadCaddies() {
+        isLoading = true
+        groupedCaddies.removeAll()
+        
+        switch selectedStatus {
+        case .standBy:
+            service.fetchStandby { result in
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                    switch result {
+                    case .success(let groups):
+                        // convert ke format [GroupName: [Caddy]]
+                        var dict: [String: [Caddy]] = [:]
+                        for group in groups {
+                            dict[group.caddyGroup.groupName] = group.caddies.map {
+                                Caddy(id: $0.id, name: $0.name, status: "standby")
+                            }
+                        }
+                        self.groupedCaddies = dict
+                    case .failure(let error):
+                        self.errorMessage = error.localizedDescription
+                    }
+                }
+            }
+        case .onField:
+            service.fetchOnfield { result in
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                    switch result {
+                    case .success(let caddies):
+                        self.groupedCaddies = ["On Field": caddies]
+                    case .failure(let error):
+                        self.errorMessage = error.localizedDescription
+                    }
+                }
+            }
+        case .done:
+            service.fetchDone { result in
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                    switch result {
+                    case .success(let caddies):
+                        self.groupedCaddies = ["Done": caddies]
+                    case .failure(let error):
+                        self.errorMessage = error.localizedDescription
+                    }
+                }
+            }
         }
-    }
-    
-    var filteredCaddies: [Caddy] {
-        caddies.filter { $0.status == selectedStatus }
     }
 }

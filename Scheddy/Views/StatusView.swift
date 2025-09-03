@@ -11,62 +11,65 @@ struct StatusView: View {
     @StateObject private var viewModel = CaddyStatusViewModel()
     @State private var isSidebarVisible = false
     @State private var selectedMenu = "Status"
+    @State private var expandedGroups: Set<String> = ["CADDY REQUEST"]
     
     var body: some View {
         NavigationStack {
             VStack {
-                // Segmented Control
-                Picker("Status", selection: $viewModel.selectedStatus) {
-                    ForEach(CaddyStatus.allCases, id: \.self) { status in
-                        Text(status.rawValue).tag(status)
+                // Segmented Control < Bisa diganti-ganti items dan labelsnya
+                CustomSegmentedControl(
+                    items: CaddyStatus.allCases,
+                    selection: $viewModel.selectedStatus,
+                    label: { status in
+                        switch status {
+                        case .onField: "On Field"
+                        case .standBy: "Stand-By"
+                        case .done: "Selesai"
+                        }
                     }
+                )
+                .onChange(of: viewModel.selectedStatus) { _ in
+                    viewModel.loadCaddies()
                 }
-                .pickerStyle(.segmented)
                 .padding(.horizontal)
-                
-                // List Caddy
-                List(viewModel.filteredCaddies) { caddy in
-                    Text(caddy.name)
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color(UIColor.systemGray6))
-                        )
-                        .padding(.vertical, 12)
-//                        .padding(.horizontal, 20)
-                        .listRowSeparator(.hidden)
-                        .listRowBackground(Color.clear)
-                        .listRowInsets(EdgeInsets())
-                }
-                .listStyle(PlainListStyle())
             }
-            .padding(.horizontal, 40)
-            .navigationTitle("Status Hari Ini")
+            .padding()
+            .navigationTitle("")
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        withAnimation { isSidebarVisible.toggle() }
-                    } label: {
-                        Image(systemName: "sidebar.left")
+                ToolbarItem(placement: .topBarLeading) {
+                    VStack(alignment: .leading) {
+                        Text("Status")
+                            .font(.largeTitle.bold())
+                        Text(Date(), style: .date)
+                            .font(.title2)
+                            .foregroundColor(.secondary)
                     }
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        print("Profile tapped")
-                    } label: {
-                        Image(systemName: "person.circle.fill")
-                    }
+                    .padding(.top)
                 }
             }
-            .overlay {
-                SidebarView(isVisible: $isSidebarVisible, selection: $selectedMenu)
+            .padding(.vertical)
+            .onAppear {
+                viewModel.loadCaddies()
+            }
+            
+            // List Caddy
+            ScrollView {
+                VStack(spacing: 16) {
+                    ForEach(viewModel.groupedCaddies.keys.sorted(), id: \.self) { group in
+                        CollapsibleGroup(title: group) {
+                            VStack(spacing: 12) {
+                                ForEach(viewModel.groupedCaddies[group] ?? []) { caddy in
+                                    CaddyRow(caddy: caddy)
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+                }
+                .padding(.vertical)
             }
         }
+        .padding(.horizontal, 40)
+        .navigationTitle(Text("Status"))
     }
-}
-
-#Preview {
-    StatusView()
 }

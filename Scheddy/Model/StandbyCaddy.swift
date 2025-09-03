@@ -1,8 +1,8 @@
 //
-//  Group.swift
+//  Caddy.swift
 //  Scheddy
 //
-//  Created by Maria Angelica Vinesytha Chandrawan on 01/09/25.
+//  Created by Maria Angelica Vinesytha Chandrawan on 29/08/25.
 //
 
 import Foundation
@@ -20,7 +20,7 @@ struct StandbyGroup: Codable, Identifiable {
     let idCaddyGroup: String
     let caddyGroup: CaddyGroup
     let caddies: [StandbyCaddy]
-    
+
     enum CodingKeys: String, CodingKey {
         case id, urutan, date, shift
         case idCaddyGroup = "id_caddy_group"
@@ -32,7 +32,7 @@ struct StandbyGroup: Codable, Identifiable {
 struct CaddyGroup: Codable {
     let groupName: String
     let id: String
-    
+
     enum CodingKeys: String, CodingKey {
         case groupName = "group_name"
         case id
@@ -46,7 +46,7 @@ struct StandbyCaddy: Codable, Identifiable {
     let idUser: String
     let idCaddyGroup: String
     let urutan: Int
-    
+
     enum CodingKeys: String, CodingKey {
         case id, name, urutan
         case caddyType = "caddy_type"
