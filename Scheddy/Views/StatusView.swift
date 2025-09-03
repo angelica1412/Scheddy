@@ -51,8 +51,7 @@ struct StatusView: View {
             .onAppear {
                 viewModel.loadCaddies()
             }
-            
-            // List Caddy
+          
             ScrollView {
                 VStack(spacing: 16) {
                     ForEach(viewModel.groupedCaddies.keys.sorted(), id: \.self) { group in
