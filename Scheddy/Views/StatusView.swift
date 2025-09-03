@@ -31,7 +31,7 @@ struct StatusView: View {
                 .onChange(of: viewModel.selectedStatus) { _ in
                     viewModel.loadCaddies()
                 }
-                .padding(.horizontal)
+//                .padding(.horizontal)
             }
             .padding()
             .navigationTitle("")
