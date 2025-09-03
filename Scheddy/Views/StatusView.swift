@@ -28,7 +28,6 @@ struct StatusView: View {
                     }
                 )
                 .padding(.horizontal)
-                
                 // Konten berubah sesuai segmented control
                 switch viewModel.selectedStatus {
                 case .onField:
@@ -57,8 +56,4 @@ struct StatusView: View {
         .padding(.horizontal, 40)
         .navigationTitle(Text("Status"))
     }
-}
-
-#Preview {
-    StatusView()
 }
