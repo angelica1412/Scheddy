@@ -11,12 +11,11 @@ struct StatusView: View {
     @StateObject private var viewModel = CaddyStatusViewModel()
     @State private var isSidebarVisible = false
     @State private var selectedMenu = "Status"
-    @State private var expandedGroups: Set<String> = ["CADDY REQUEST"]
     
     var body: some View {
         NavigationStack {
             VStack {
-                // Segmented Control < Bisa diganti-ganti items dan labelsnya
+                // Segmented Control
                 CustomSegmentedControl(
                     items: CaddyStatus.allCases,
                     selection: $viewModel.selectedStatus,
@@ -28,10 +27,16 @@ struct StatusView: View {
                         }
                     }
                 )
-                .onChange(of: viewModel.selectedStatus) { _ in
-                    viewModel.loadCaddies()
-                }
                 .padding(.horizontal)
+                // Konten berubah sesuai segmented control
+                switch viewModel.selectedStatus {
+                case .onField:
+                    OnFieldListView(groupedCaddies: viewModel.groupedCaddies)
+                case .standBy:
+                    StandByListView(groupedCaddies: viewModel.groupedCaddies)
+                case .done:
+                    DoneListView(groupedCaddies: viewModel.groupedCaddies)
+                }
             }
             .padding()
             .navigationTitle("")
@@ -46,26 +51,6 @@ struct StatusView: View {
                     }
                     .padding(.top)
                 }
-            }
-            .padding(.vertical)
-            .onAppear {
-                viewModel.loadCaddies()
-            }
-          
-            ScrollView {
-                VStack(spacing: 16) {
-                    ForEach(viewModel.groupedCaddies.keys.sorted(), id: \.self) { group in
-                        CollapsibleGroup(title: group) {
-                            VStack(spacing: 12) {
-                                ForEach(viewModel.groupedCaddies[group] ?? []) { caddy in
-                                    CaddyRow(caddy: caddy)
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                    }
-                }
-                .padding(.vertical)
             }
         }
         .padding(.horizontal, 40)
