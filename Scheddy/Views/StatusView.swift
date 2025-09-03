@@ -28,25 +28,30 @@ struct StatusView: View {
                         }
                     }
                 )
+                .onChange(of: viewModel.selectedStatus) { _ in
+                    viewModel.loadCaddies()
+                }
                 .padding(.horizontal)
+            }
+            .padding()
+            .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    VStack(alignment: .leading) {
+                        Text("Status")
+                            .font(.largeTitle.bold())
+                        Text(Date(), style: .date)
+                            .font(.title2)
+                            .foregroundColor(.secondary)
                     }
-                    .padding()
-                    .navigationTitle("")
-                    .toolbar {
-                        ToolbarItem(placement: .topBarLeading) {
-                            VStack(alignment: .leading) {
-                                Text("Status")
-                                    .font(.largeTitle.bold())
-                                Text(Date(), style: .date)
-                                    .font(.title2)
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding(.top)
-                        }
-                    }
-                    .padding(.vertical)
-                
-                // List Caddy
+                    .padding(.top)
+                }
+            }
+            .padding(.vertical)
+            .onAppear {
+                viewModel.loadCaddies()
+            }
+          
             ScrollView {
                 VStack(spacing: 16) {
                     ForEach(viewModel.groupedCaddies.keys.sorted(), id: \.self) { group in
@@ -65,28 +70,5 @@ struct StatusView: View {
         }
         .padding(.horizontal, 40)
         .navigationTitle(Text("Status"))
-//        .toolbar {
-//            ToolbarItem(placement: .navigationBarLeading) {
-//                Button {
-//                    withAnimation { isSidebarVisible.toggle() }
-//                } label: {
-//                    Image(systemName: "sidebar.left")
-//                }
-//            }
-//            ToolbarItem(placement: .navigationBarTrailing) {
-//                Button {
-//                    print("Profile tapped")
-//                } label: {
-//                    Image(systemName: "person.circle.fill")
-//                }
-//            }
-//        }
-//        .overlay {
-//            SidebarView(isVisible: $isSidebarVisible, selection: $selectedMenu)
-//        }
     }
-}
-
-#Preview {
-    StatusView()
 }

@@ -2,20 +2,11 @@
 //  Caddy.swift
 //  Scheddy
 //
-//  Created by Maria Angelica Vinesytha Chandrawan on 29/08/25.
+//  Created by Maria Angelica Vinesytha Chandrawan on 02/09/25.
 //
 
-import Foundation
-
-struct Caddy: Identifiable, Codable {
-    let id: Int
+struct Caddy: Codable, Identifiable {
+    let id: String
     let name: String
-    let status: CaddyStatus
-    let group: String
-}
-
-enum CaddyStatus: String, Codable, CaseIterable {
-    case onField = "On Field"
-    case standBy = "Stand By"
-    case done = "Done"
+    let status: String?
 }
