@@ -8,27 +8,74 @@
 import SwiftUI
 
 struct OnFieldListView: View {
-    let groupedCaddies: [String: [Caddy]]
-    
+
+    let groupedCaddies: [CaddyGroupGeneric]
+    let isLoading: Bool
+    let errorMessage: String?
+
+    @State private var selectedCaddy: Caddy? = nil
+
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                ForEach(groupedCaddies.keys.sorted(), id: \.self) { group in
-                    CollapsibleGroup(title: group) {
-                        VStack(spacing: 12) {
-                            ForEach(groupedCaddies[group] ?? []) { caddy in
-                                CaddyRow(caddy: caddy)
+        ZStack {
+            ScrollView {
+                VStack(spacing: 16) {
+                    ForEach(groupedCaddies) { group in
+                        CollapsibleGroup(title: group.nama) {
+                            VStack(spacing: 12) {
+                                ForEach(group.caddies) { caddy in
+                                    Button {
+                                        selectedCaddy = Caddy(
+                                            id: caddy.id,
+                                            name: caddy.nama,
+                                            caddy_type: 0,
+                                            id_user: "",
+                                            id_caddy_group: "",
+                                            urutan: 0
+                                        )
+                                    } label: {
+                                        CaddyRow(
+                                            caddy: Caddy(
+                                                id: caddy.id,
+                                                name: caddy.nama,
+                                                caddy_type: 0,
+                                                id_user: "",
+                                                id_caddy_group: "",
+                                                urutan: 0
+                                            )
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                }
                             }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
                     }
                 }
+                .padding(.vertical, 4)
             }
-            .padding(.vertical)
+            .sheet(item: $selectedCaddy) { caddy in
+                CheckOutView(caddyId: caddy.id)
+            }
+
+            // Overlay for loading and error
+            if isLoading {
+                VStack {
+                    ProgressView("Loading...")
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(12)
+                }
+            } else if let error = errorMessage {
+                Color.black.opacity(0.3)
+                    .ignoresSafeArea()
+                VStack {
+                    Text(error)
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.red)
+                        .cornerRadius(12)
+                }
+            }
         }
     }
 }
-
-//#Preview {
-//    OnFieldListView()
-//}
