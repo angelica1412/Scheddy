@@ -2,7 +2,7 @@
 //  CheckInService.swift
 //  Scheddy
 //
-//  Created by Maria Angelica Vinesytha Chandrawan on 01/09/25.
+//  Created by Maria Angelica Vinesytha Chandrawan on 03/09/25.
 //
 
 import Foundation

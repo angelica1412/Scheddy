@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct OnFieldListView: View {
+
     let groupedCaddies: [CaddyGroupGeneric]
     let isLoading: Bool
     let errorMessage: String?

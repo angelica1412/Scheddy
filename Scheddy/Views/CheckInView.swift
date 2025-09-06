@@ -12,7 +12,6 @@ struct CheckInView: View {
 
     let caddyId: String
     let caddyName: String
-
     @State private var playerName = ""
     @State private var playerID = ""
     @State private var holeCount = 18

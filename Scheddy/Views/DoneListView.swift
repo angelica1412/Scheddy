@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct DoneListView: View {
+  
     let groupedCaddies: [CaddyGroupGeneric]
     let isLoading: Bool
     let errorMessage: String?
