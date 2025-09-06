@@ -10,16 +10,11 @@ import SwiftUI
 struct StatusView: View {
     @StateObject private var viewModel = CaddyStatusViewModel()
     @State private var isSidebarVisible = false
-<<<<<<< Updated upstream
-    @State private var selectedMenu = "Status"
-    @State private var expandedGroups: Set<String> = ["CADDY REQUEST"]
-=======
->>>>>>> Stashed changes
     
     var body: some View {
         NavigationStack {
             VStack {
-                // Segmented Control < Bisa diganti-ganti items dan labelsnya
+                // Segmented Control
                 CustomSegmentedControl(
                     items: CaddyStatus.allCases,
                     selection: $viewModel.selectedStatus,
@@ -31,40 +26,40 @@ struct StatusView: View {
                         }
                     }
                 )
-<<<<<<< Updated upstream
-                .onChange(of: viewModel.selectedStatus) { _ in
-                    viewModel.loadCaddies()
-=======
                 .padding(.horizontal)
                 .padding(.top, 20)
+
+                // Konten sesuai status
                 switch viewModel.selectedStatus {
                 case .onField:
                     OnFieldListView(
                         groupedCaddies: viewModel.groupedCaddiesOnField,
                         isLoading: viewModel.isLoading,
-                        errorMessage: nil)
+                        errorMessage: nil
+                    )
                 case .standBy:
                     StandByListView(
                         groupedCaddies: viewModel.groupedCaddiesStandBy,
                         isLoading: viewModel.isLoading,
-                        errorMessage: nil)
+                        errorMessage: nil
+                    )
                 case .done:
                     DoneListView(
                         groupedCaddies: viewModel.groupedCaddiesDone,
                         isLoading: viewModel.isLoading,
-                        errorMessage: nil)
->>>>>>> Stashed changes
+                        errorMessage: nil
+                    )
                 }
-//                .padding(.horizontal)
             }
             .task {
                 await viewModel.loadCaddies()
             }
             .onChange(of: viewModel.selectedStatus) { _ in
-                Task { await viewModel.loadCaddies() }
+                Task { @MainActor in
+                    await viewModel.loadCaddies()
+                }
             }
             .padding()
-<<<<<<< Updated upstream
             .navigationTitle("")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -78,42 +73,6 @@ struct StatusView: View {
                     .padding(.top)
                 }
             }
-            .padding(.vertical)
-            .onAppear {
-                viewModel.loadCaddies()
-            }
-          
-            ScrollView {
-                VStack(spacing: 16) {
-                    ForEach(viewModel.groupedCaddies.keys.sorted(), id: \.self) { group in
-                        CollapsibleGroup(title: group) {
-                            VStack(spacing: 12) {
-                                ForEach(viewModel.groupedCaddies[group] ?? []) { caddy in
-                                    CaddyRow(caddy: caddy)
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                    }
-                }
-                .padding(.vertical)
-            }
-=======
-            //            .toolbar {
-            //                ToolbarItem(placement: .topBarLeading) {
-            //                    VStack(alignment: .leading) {
-            //                        Text("Aktivitas Caddy")
-            //                            .font(.title.bold())
-            //                        Text(Date(), style: .date)
-            //                            .font(.title2)
-            //                            .foregroundColor(.secondary)
-            //                    }
-            //                    .padding(.top,36)
-            //                    .padding(.horizontal, 12)
-            //                }
-            //            }
->>>>>>> Stashed changes
         }
-        //        .navigationTitle(Text("Status"))
     }
 }

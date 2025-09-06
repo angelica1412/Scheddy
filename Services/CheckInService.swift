@@ -7,17 +7,6 @@
 
 import Foundation
 
-<<<<<<< Updated upstream
-class CheckinService: APIService {
-    
-    func fetchCheckin(idCaddy: Int, completion: @escaping (Result<CheckInResponse, Error>) -> Void) {
-        request(endpoint: "/checkin/\(idCaddy)", completion: completion)
-    }
-    
-    func updateDone(checkinId: Int, completion: @escaping (Result<Void, Error>) -> Void) {
-        let endpoint = "/update-done/\(checkinId)"
-        requestVoid(endpoint: endpoint, method: "PUT", completion: completion)
-=======
 class CheckInService :APIService {
     
     func checkIn(requestData: CheckInRequest) async throws -> CheckInResponse {
@@ -29,6 +18,5 @@ class CheckInService :APIService {
         
         let (data, _) = try await URLSession.shared.data(for: req)
         return try JSONDecoder().decode(CheckInResponse.self, from: data)
->>>>>>> Stashed changes
     }
 }
