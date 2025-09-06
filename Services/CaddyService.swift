@@ -2,26 +2,38 @@
 //  CaddyService.swift
 //  Scheddy
 //
-//  Created by Maria Angelica Vinesytha Chandrawan on 01/09/25.
+//  Created by Maria Angelica Vinesytha Chandrawan on 03/09/25.
 //
 
 import Foundation
 
-class CaddyService: APIService {
-    func fetchStandby(completion: @escaping (Result<[StandbyGroup], Error>) -> Void) {
-        request(endpoint: "/rekap/standby_caddy_sorted") { (result: Result<StandbyCaddyResponse, Error>) in
-            switch result {
-            case .success(let response):
-                completion(.success(response.data))
-            case .failure(let error):
-                completion(.failure(error))
+class CaddyService :APIService {
+    // MARK: - Fetch StandBy
+    func fetchStandBy() async throws -> [CaddyGroupData] {
+        let url = URL(string: "\(baseURL)/rekap/standby_caddy_sorted")!
+        let (data, _) = try await URLSession.shared.data(from: url)
+        let response = try JSONDecoder().decode(CaddyStandbyResponse.self, from: data)
+        return response.data
+    }
+    
+    // MARK: - Fetch OnField
+    func fetchOnField() async throws -> [CaddyGroupGeneric] {
+        let url = URL(string: "\(baseURL)/rekap/caddy_onfield")!
+        let (data, _) = try await URLSession.shared.data(from: url)
+        if let jsonString = String(data: data, encoding: .utf8) {
+                print(jsonString)
+            } else {
+                print("Could not convert data to string.")
             }
-        }
+        let response = try JSONDecoder().decode(CaddyGroupResponse.self, from: data)
+        return response.data.map { $0.group }
     }
-    func fetchOnfield(completion: @escaping (Result<[Caddy], Error>) -> Void) {
-        request(endpoint: "/rekap/caddy_onfield", completion: completion)
-    }
-    func fetchDone(completion: @escaping (Result<[Caddy], Error>) -> Void) {
-        request(endpoint: "/rekap/caddy_done", completion: completion)
+    
+    // MARK: - Fetch Done
+    func fetchDone() async throws -> [CaddyGroupGeneric] {
+        let url = URL(string: "\(baseURL)/rekap/caddy_done")!
+        let (data, _) = try await URLSession.shared.data(from: url)
+        let response = try JSONDecoder().decode(CaddyGroupResponse.self, from: data)
+        return response.data.map { $0.group }
     }
 }
