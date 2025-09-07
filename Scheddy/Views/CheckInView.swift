@@ -9,143 +9,245 @@ import SwiftUI
 
 struct CheckInView: View {
     @Environment(\.dismiss) var dismiss
-    
-    // Caddy yang dipilih dikirim dari luar
-    let caddyId: Int
+
+    let caddyId: String
     let caddyName: String
-    
     @State private var playerName = ""
     @State private var playerID = ""
     @State private var holeCount = 18
     @State private var caddyRequest = false
-    
+
     @State private var wood = 0
-    @State private var iron = 3
+    @State private var iron = 0
     @State private var putter = 0
-    @State private var umbrella = 3
+    @State private var umbrella = 0
     @State private var otherItem = ""
-    
+
+    @StateObject private var viewModel = CheckInViewModel()
+
+    @State private var showExitAlert = false
+    @State private var showSuccessAlert = false
+
     var body: some View {
-        // Cancel Button
-        HStack {
-            Button("Kembali") {
+        VStack {
+            ZStack {
+                HStack {
+                    Button(action: { showExitAlert = true }) {
+                        HStack {
+                            Image(systemName: "chevron.left")
+                            Text("Batal")
+                        }
+                        .foregroundColor(.blue)
+                    }
+                    Spacer()
+                }
+                
+                Text("Check-In")
+                    .font(.headline)
+                    .foregroundColor(.black)
+            }
+            .padding(.horizontal)
+            .padding(.top, 8)
+            .padding(.bottom, 16)
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: 30) {
+                    VStack(alignment: .leading, spacing: 20) {
+                        // Caddy Name Section
+                        HStack {
+                            Text("Nama Caddy")
+                                .font(.headline)
+                                .bold()
+                                .foregroundColor(.black)
+                                .frame(width: 120, alignment: .leading)
+                            Text(caddyName)
+                                .font(.headline)
+                                .foregroundColor(.black)
+                        }
+                        
+                        // Player Name Section
+                        HStack {
+                            Text("Nama Pemain")
+                                .font(.headline)
+                                .bold()
+                                .frame(width: 120, alignment: .leading)
+                            TextField("(Contoh: John Doe)", text: $playerName)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 14)
+                                .cornerRadius(15)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                )
+                        }
+                        
+                        // Player ID Section
+                        HStack {
+                            Text("ID Pemain")
+                                .font(.headline)
+                                .bold()
+                                .frame(width: 120, alignment: .leading)
+                            TextField("(Contoh: 123456)", text: $playerID)
+                                .keyboardType(.numberPad)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 14)
+                                .cornerRadius(15)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                )
+                        }
+                        
+                        // Caddy Request Section
+                        HStack {
+                            Text("Caddy Request")
+                                .font(.headline)
+                                .bold()
+                                .frame(width: 120, alignment: .leading)
+                            Toggle("", isOn: $caddyRequest)
+                                .labelsHidden()
+                                .scaleEffect(0.8)
+                            Spacer()
+                        }
+                        
+                        // Bag Items Section
+                        VStack(alignment: .leading, spacing: 20) {
+                            Text("Bag Items")
+                                .font(.headline)
+                                .foregroundColor(.black)
+                            
+                            HStack(spacing: 40) {
+                                // Left Column
+                                VStack(spacing: 15) {
+                                    HStack {
+                                        Text("Wood")
+                                            .font(.body)
+                                            .foregroundColor(.black)
+                                            .frame(width: 80, alignment: .leading)
+                                        ItemStepper(title: "", count: $wood)
+                                    }
+                                    
+                                    HStack {
+                                        Text("Iron")
+                                            .font(.body)
+                                            .foregroundColor(.black)
+                                            .frame(width: 80, alignment: .leading)
+                                        ItemStepper(title: "", count: $iron)
+                                    }
+                                }
+                                Spacer()
+                                // Right Column
+                                VStack(spacing: 15) {
+                                    HStack {
+                                        Text("Putter")
+                                            .font(.body)
+                                            .foregroundColor(.black)
+                                            .frame(width: 80, alignment: .leading)
+                                        ItemStepper(title: "", count: $putter)
+                                    }
+                                    
+                                    HStack {
+                                        Text("Umbrella")
+                                            .font(.body)
+                                            .foregroundColor(.black)
+                                            .frame(width: 80, alignment: .leading)
+                                        ItemStepper(title: "", count: $umbrella)
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 16)
+                        }
+                        
+                        // Other Items Section
+                        HStack {
+                            Text("Lainnya")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.black)
+                                .frame(width: 120, alignment: .leading)
+                            TextField("(Contoh: Penutup Stick Golf, x1)", text: $otherItem)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 14)
+                                .cornerRadius(15)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                )
+                        }
+                    }
+                    
+                    // Check-In Button
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            viewModel.playerName = playerName
+                            viewModel.playerID = playerID
+                            viewModel.caddyRequest = caddyRequest
+                            viewModel.wood = wood
+                            viewModel.iron = iron
+                            viewModel.putter = putter
+                            viewModel.umbrella = umbrella
+                            viewModel.otherItem = otherItem
+                            viewModel.holeCount = holeCount
+                            
+                            Task {
+                                await viewModel.checkInCaddy(idCaddy: caddyId)
+                                if viewModel.successMessage != nil {
+                                    showSuccessAlert = true
+                                }
+                            }
+                        }) {
+                            if viewModel.isLoading {
+                                ProgressView()
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.gray.opacity(0.3))
+                                    .cornerRadius(25)
+                            } else {
+                                Text("CHECK-IN")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 16)
+                                    .background(Color.hijauMuda)
+                                    .cornerRadius(40)
+                            }
+                        }
+                        .frame(maxWidth: 400)
+                        Spacer()
+                    }
+                    .padding(.top, 20)
+                    
+                    if let error = viewModel.errorMessage {
+                        Text(error)
+                            .foregroundColor(.red)
+                            .font(.footnote)
+                    }
+                    
+                    if let success = viewModel.successMessage {
+                        Text(success)
+                            .foregroundColor(.green)
+                            .font(.footnote)
+                    }
+                }
+                .padding()
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.white)
+        .alert("Data Belum Tersimpan", isPresented: $showExitAlert) {
+            Button("Keluar", role: .destructive) {
                 dismiss()
             }
-            Spacer()
-        }.padding(.leading)
-        .padding(.top)
-        
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                
-                // Title (dinamis)
-                Text(caddyName)
-                    .font(.title)
-                    .bold()
-                
-                
-                Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 12) {
-                    // Player Name
-                    GridRow {
-                        Text("Nama Pemain")
-                            .font(.headline)
-                        TextField("Nama Pemain", text: $playerName)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                    }
-                    
-                    // Player ID
-                    GridRow {
-                        Text("ID Pemain")
-                            .font(.headline)
-                        TextField("ID Pemain", text: $playerID)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                    }
-                    
-                    // Caddy Request
-                    GridRow {
-                        Text("Caddy Request")
-                            .font(.headline)
-                        Toggle("", isOn: $caddyRequest) // hanya switch
-                            .labelsHidden() // sembunyikan label default
-                    }
-                    
-                    Text("Bag Items")
-                        .font(.headline)
-                    
-                    HStack (spacing: 0){
-                        Grid(alignment: .leading, horizontalSpacing: 50, verticalSpacing: 12) {
-                            GridRow {
-                                HStack {
-                                    Text("Wood")
-                                    ItemStepper(title: "", count: $wood)
-                                }.padding(.trailing, 50)
-                            }
-                            
-                            GridRow {
-                                HStack {
-                                    Text("Iron")
-                                    ItemStepper(title: "", count: $iron)
-                                }.padding(.trailing, 50)
-                            }
-                        }
-
-                        Grid(alignment: .leading, horizontalSpacing: 50, verticalSpacing: 12) {
-                            GridRow {
-                                HStack {
-                                    Text("Putter")
-                                    ItemStepper(title: "", count: $putter)
-                                }.padding(.trailing, 50)
-                            }
-
-                            GridRow {
-                                HStack {
-                                    Text("Umbrella")
-                                    ItemStepper(title: "", count: $umbrella)
-                                }.padding(.trailing, 50)
-                            }
-                        }
-                    }
-
-                    // Extra ID Field
-                    GridRow {
-                        Text("Barang Lainnya")
-                            .font(.headline)
-                        TextField("Tambahkan barang lainnya", text: $otherItem)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                    }
-                }
-                
-                // Hole Picker
-                //                VStack(alignment: .leading) {
-                //                    Text("Jumlah Hole")
-                //                        .font(.headline)
-                //                    Picker("Jumlah Hole", selection: $holeCount) {
-                //                        Text("9").tag(9)
-                //                        Text("18").tag(18)
-                //                    }
-                //                    .pickerStyle(.segmented)
-                //                }
-                
-                // Check-In Button
-                Button(action: {
-                    dismiss()
-                }) {
-                    Text("CHECK-IN")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .foregroundColor(.white)
-                        .background(Color.teal)
-                        .cornerRadius(12)
-                }
-                .padding(.top)
-            }
-            .padding()
-        
+            Button("Tetap di halaman", role: .cancel) { }
+        } message: {
+            Text("Anda yakin ingin kembali tanpa menyimpan data check-in caddy?")
         }
-        .frame(maxWidth:.infinity)
+        .alert("Berhasil", isPresented: $showSuccessAlert) {
+            Button("Lanjutkan") {
+                dismiss()
+            }
+        } message: {
+            Text("Data check-in berhasil tersimpan")
+        }
     }
-}
-
-#Preview {
-    CheckInView(caddyId: 1, caddyName: "Intan Permata")
 }

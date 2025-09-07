@@ -12,32 +12,35 @@ struct ItemStepper: View {
     @Binding var count: Int
     
     var body: some View {
-        HStack {
-            Text(title)
-                .frame(width: 100, alignment: .leading)
-            
-            Spacer()
-            
+        HStack(spacing: 15) {
             Button(action: {
-                if count > 0 { count -= 1 }
+                if count > 0 {
+                    count -= 1
+                }
             }) {
                 Image(systemName: "minus")
-                    .frame(width: 32, height: 32)
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.black)
+                    .frame(width: 30, height: 30)
                     .background(Color.gray.opacity(0.2))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .clipShape(Rectangle())
+                    .cornerRadius(8)
             }
             
             Text("\(count)")
-                .frame(width: 30)
+                .font(.system(size: 16))
+                .frame(minWidth: 20)
             
             Button(action: {
                 count += 1
             }) {
                 Image(systemName: "plus")
-                    .frame(width: 32, height: 32)
-                    .background(Color.teal)
-                    .foregroundColor(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.black)
+                    .frame(width: 30, height: 30)
+                    .background(Color.gray.opacity(0.2))
+                    .clipShape(Rectangle())
+                    .cornerRadius(8)
             }
         }
     }

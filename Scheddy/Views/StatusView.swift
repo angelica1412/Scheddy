@@ -10,7 +10,6 @@ import SwiftUI
 struct StatusView: View {
     @StateObject private var viewModel = CaddyStatusViewModel()
     @State private var isSidebarVisible = false
-    @State private var selectedMenu = "Status"
     
     var body: some View {
         NavigationStack {
@@ -28,14 +27,36 @@ struct StatusView: View {
                     }
                 )
                 .padding(.horizontal)
-                // Konten berubah sesuai segmented control
+                .padding(.top, 20)
+
+                // Konten sesuai status
                 switch viewModel.selectedStatus {
                 case .onField:
-                    OnFieldListView(groupedCaddies: viewModel.groupedCaddies)
+                    OnFieldListView(
+                        groupedCaddies: viewModel.groupedCaddiesOnField,
+                        isLoading: viewModel.isLoading,
+                        errorMessage: nil
+                    )
                 case .standBy:
-                    StandByListView(groupedCaddies: viewModel.groupedCaddies)
+                    StandByListView(
+                        groupedCaddies: viewModel.groupedCaddiesStandBy,
+                        isLoading: viewModel.isLoading,
+                        errorMessage: nil
+                    )
                 case .done:
-                    DoneListView(groupedCaddies: viewModel.groupedCaddies)
+                    DoneListView(
+                        groupedCaddies: viewModel.groupedCaddiesDone,
+                        isLoading: viewModel.isLoading,
+                        errorMessage: nil
+                    )
+                }
+            }
+            .task {
+                await viewModel.loadCaddies()
+            }
+            .onChange(of: viewModel.selectedStatus) { _ in
+                Task { @MainActor in
+                    await viewModel.loadCaddies()
                 }
             }
             .padding()
@@ -53,7 +74,5 @@ struct StatusView: View {
                 }
             }
         }
-        .padding(.horizontal, 40)
-        .navigationTitle(Text("Status"))
     }
 }
