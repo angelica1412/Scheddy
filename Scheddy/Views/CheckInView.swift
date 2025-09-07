@@ -44,7 +44,6 @@ struct CheckInView: View {
                 
                 Text("Check-In")
                     .font(.headline)
-                    .fontWeight(.semibold)
                     .foregroundColor(.black)
             }
             .padding(.horizontal)
