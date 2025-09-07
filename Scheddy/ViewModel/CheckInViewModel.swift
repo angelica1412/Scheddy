@@ -18,6 +18,7 @@ class CheckInViewModel: ObservableObject {
     @Published var umbrella: Int = 0
     @Published var otherItem: String = ""
     @Published var holeCount: Int = 18
+    @Published var booked: Bool = false
     
     @Published var isLoading = false
     @Published var successMessage: String?
@@ -41,14 +42,14 @@ class CheckInViewModel: ObservableObject {
             kode: playerID,
             namaPemain: playerName,
             dateTurun: nowString,
-            booked: true,
+            booked: booked,
             jumlahHole: holeCount,
             status: 0,
             woodQuantity: wood,
             ironQuantity: iron,
             putterQuantity: putter,
             umbrellaQuantity: umbrella,
-            otherItems: otherItem.isEmpty ? nil : otherItem
+            otherItems: otherItem.isEmpty ? nil : otherItem,
         )
         
         do {
