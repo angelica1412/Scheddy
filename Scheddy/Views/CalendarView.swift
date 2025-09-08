@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CalendarMonthView: View {
     @StateObject private var vm = CalendarMonthViewModel()
+    @State private var displayedMonth = Date()
     
     let month: Date
     private let columns = Array(repeating: GridItem(.flexible()), count: 7)
@@ -26,38 +27,87 @@ struct CalendarMonthView: View {
         return f
     }()
     
+    private var currentMonth: Date {
+        Date()
+    }
+    
+    private var nextMonth: Date {
+        Calendar.current.date(byAdding: .month, value: 1, to: Date())!
+    }
+    
     var body: some View {
         VStack(spacing: 12) {
             // Month header
-            Text(monthFormatter.string(from: month).capitalized)
-                .font(.title2.bold())
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
-            
-            // Weekday header
             HStack {
-                ForEach(["S","M","T","W","T","F","S"], id: \.self) { w in
-                    Text(w)
-                        .frame(maxWidth: .infinity)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(w == "S" ? .green : .secondary)
+                Spacer()
+                
+                // Chevron Prev Month
+                Button(action: {
+                    if let prev = Calendar.current.date(byAdding: .month, value: -1, to: displayedMonth) {
+                        displayedMonth = prev
+                    }
+                }) {
+                    Image(systemName: "chevron.left")
+                        .font(.title.weight(.semibold))
+                        .foregroundColor(
+                            Calendar.current.isDate(displayedMonth, equalTo: currentMonth, toGranularity: .month)
+                            ? .gray
+                            : .green
+                        )
                 }
+                .disabled(Calendar.current.isDate(displayedMonth, equalTo: currentMonth, toGranularity: .month))
+                
+                // Display Month
+                Text(monthFormatter.string(from: displayedMonth).capitalized)
+                    .font(.title.bold())
+                    .frame(maxWidth: 500)
+                
+                // Chevron Next Month
+                Button(action: {
+                    if let next = Calendar.current.date(byAdding: .month, value: 1, to: displayedMonth) {
+                        displayedMonth = next
+                    }
+                }) {
+                    Image(systemName: "chevron.right")
+                        .font(.title.weight(.semibold))
+                        .foregroundColor(
+                            Calendar.current.isDate(displayedMonth, equalTo: nextMonth, toGranularity: .month)
+                            ? .gray
+                            : .green
+                        )
+                }
+                .disabled(Calendar.current.isDate(displayedMonth, equalTo: nextMonth, toGranularity: .month))
+                
+                Spacer()
             }
             
             // Grid of days
             LazyVGrid(columns: columns, spacing: 8) {
+                ForEach(["Minggu","Senin","Selasa","Rabu","kamis","Jumat","Sabtu"], id: \.self) { day in
+                    Text(day)
+                        .frame(maxWidth: .infinity)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(day == "Minggu" || day == "Sabtu" ? .green : .secondary)
+                }
+                
                 ForEach(vm.days) { day in
                     VStack(spacing: 4) {
-                        if (day.isCurrentMonth){
+                        if day.isCurrentMonth {
                             Text(dayFormatter.string(from: day.date))
                                 .font(.headline)
                                 .foregroundColor(.primary)
+                                .frame(width: 70, height: 60)
+                                .background(
+                                    Calendar.current.isDateInToday(day.date) ?
+                                    Circle().fill(Color.green.opacity(0.5)) : nil
+                                )
                         }
+                        
                         ForEach(day.entries) { entry in
                             switch entry {
                             case .libur:
                                 Text("LIBUR")
-                                    .font(.caption2.bold())
+                                    .font(.caption.bold())
                                     .padding(2)
                                     .frame(maxWidth: .infinity)
                                     .background(Color.red)
@@ -66,20 +116,12 @@ struct CalendarMonthView: View {
                                 
                             case .group(let group):
                                 Text(group)
-                                    .font(.caption2.bold())
+                                    .font(.caption.bold())
                                     .padding(2)
                                     .frame(maxWidth: .infinity)
                                     .background(Color.red.opacity(0.1))
                                     .foregroundColor(.primary)
                                     .cornerRadius(4)
-                                //                                    Text(person)
-                                //                                        .font(.caption2)
-                                //                                        .foregroundColor(.primary)
-                                
-                                //                            case .player(let name):
-                                //                                Text(name)
-                                //                                    .font(.caption2)
-                                //                                    .foregroundColor(.blue)
                             }
                         }
                     }
@@ -91,7 +133,12 @@ struct CalendarMonthView: View {
         }
         .onAppear {
             Task {
-                await vm.load(month: month)
+                await vm.load(month: displayedMonth)
+            }
+        }
+        .onChange(of: displayedMonth) { newValue in
+            Task {
+                await vm.load(month: newValue)
             }
         }
     }
