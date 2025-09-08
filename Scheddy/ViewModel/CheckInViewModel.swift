@@ -42,7 +42,7 @@ class CheckInViewModel: ObservableObject {
             kode: playerID,
             namaPemain: playerName,
             dateTurun: nowString,
-            booked: booked,
+            booked: caddyRequest,
             jumlahHole: holeCount,
             status: 0,
             woodQuantity: wood,

@@ -96,7 +96,7 @@ struct CheckOutView: View {
                 bagItemsSection(for: detail)
                 
                 // Other Items Section
-                infoRow(label: "Lainnya", value: detail.other_items ?? "Boneka labambu limited edition", isMultiline: true)
+                infoRow(label: "Lainnya", value: detail.other_items ?? "-", isMultiline: true)
             }
             .padding(.horizontal, 20)
             
