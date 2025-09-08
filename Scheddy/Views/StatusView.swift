@@ -76,3 +76,7 @@ struct StatusView: View {
         }
     }
 }
+
+#Preview {
+    StatusView()
+}
