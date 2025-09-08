@@ -11,13 +11,11 @@ import Foundation
 enum CalendarEntry: Identifiable {
     case libur
     case group(name: String)
-//    case player(name: String)
     
     var id: String {
         switch self {
         case .libur: return "libur"
         case .group(let g): return "group-\(g)"
-//        case .player(let name): return "player-\(name)"
         }
     }
 }
@@ -45,7 +43,7 @@ struct Libur: Decodable {
     let id: String
     let date: Date
     let isRequest: Bool
-    let caddyGroup: String
+    let namaGroup: String
 }
 
 struct Booking: Decodable {

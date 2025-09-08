@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CalendarMonthView: View {
+struct CalendarView: View {
     @StateObject private var vm = CalendarMonthViewModel()
     @State private var displayedMonth = Date()
     
@@ -52,7 +52,7 @@ struct CalendarMonthView: View {
                         .foregroundColor(
                             Calendar.current.isDate(displayedMonth, equalTo: currentMonth, toGranularity: .month)
                             ? .gray
-                            : .green
+                            : .hijauMuda
                         )
                 }
                 .disabled(Calendar.current.isDate(displayedMonth, equalTo: currentMonth, toGranularity: .month))
@@ -73,7 +73,7 @@ struct CalendarMonthView: View {
                         .foregroundColor(
                             Calendar.current.isDate(displayedMonth, equalTo: nextMonth, toGranularity: .month)
                             ? .gray
-                            : .green
+                            : .hijauMuda
                         )
                 }
                 .disabled(Calendar.current.isDate(displayedMonth, equalTo: nextMonth, toGranularity: .month))
@@ -87,7 +87,7 @@ struct CalendarMonthView: View {
                     Text(day)
                         .frame(maxWidth: .infinity)
                         .font(.subheadline.weight(.semibold))
-                        .foregroundColor(day == "Minggu" || day == "Sabtu" ? .green : .secondary)
+                        .foregroundColor(day == "Minggu" || day == "Sabtu" ? .hijauMuda : .secondary)
                 }
                 
                 ForEach(vm.days) { day in
@@ -99,7 +99,7 @@ struct CalendarMonthView: View {
                                 .frame(width: 70, height: 60)
                                 .background(
                                     Calendar.current.isDateInToday(day.date) ?
-                                    Circle().fill(Color.green.opacity(0.5)) : nil
+                                    Circle().fill(Color.hijauMuda.opacity(0.5)) : nil
                                 )
                         }
                         
@@ -129,7 +129,7 @@ struct CalendarMonthView: View {
                     .padding(4)
                 }
             }
-            .padding(.horizontal)
+            .frame(maxWidth: 1000)
         }
         .onAppear {
             Task {
@@ -141,9 +141,21 @@ struct CalendarMonthView: View {
                 await vm.load(month: newValue)
             }
         }
+        
+        Button(action: {
+            print("Buat Jadwal Libur tapped")
+        }) {
+            Text("Buat Jadwal Libur")
+                .font(.headline.weight(.bold))
+                .foregroundColor(.white)
+                .padding(.vertical, 20)
+                .frame(maxWidth: 500)
+                .background(Color.hijauMuda)
+                .clipShape(Capsule())
+        }.padding(.vertical, 20)
     }
 }
 
 #Preview {
-    CalendarMonthView(month: Date())
+    CalendarView(month: Date())
 }

@@ -55,7 +55,7 @@ class CalendarMonthViewModel: ObservableObject {
 //                // Tambahkan data libur dari API
 //                if let libur = data.libur.first(where: { calendar.isDate($0.date, inSameDayAs: date) }) {
 //                    entries.append(.libur)
-//                    entries.append(.group(name: libur.caddyGroup))
+//                    entries.append(.group(name: libur.namaGroup))
 //                }
 //                
 //                // Tambahkan data booking kalau perlu
