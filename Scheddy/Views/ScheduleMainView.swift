@@ -17,24 +17,27 @@ struct ScheduleMainView: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
-                // Custom Segmented Control
-                CustomSegmentedControl(items: Tab.allCases,
-                                       selection: $selectedTab,
-                                       label: { $0.rawValue })
-                .padding(.horizontal)
-                
-                // Konten sesuai tab
-                if selectedTab == .daily {
-                    ScheduleDailyView()
-                        .padding(10)
-                } else {
-                    CalendarView(month: Date())
-                        .padding(10)
-                }
-                
-                Spacer()
-            }.padding()
+            ZStack {
+                Color.background.ignoresSafeArea()
+                VStack {
+                    // Custom Segmented Control
+                    CustomSegmentedControl(items: Tab.allCases,
+                                           selection: $selectedTab,
+                                           label: { $0.rawValue })
+                    .padding(.horizontal)
+                    
+                    // Konten sesuai tab
+                    if selectedTab == .daily {
+                        ScheduleDailyView()
+                            .padding(10)
+                    } else {
+                        CalendarView(month: Date())
+                            .padding(10)
+                    }
+                    
+                    Spacer()
+                }.padding()
+            }
         }
     }
 }

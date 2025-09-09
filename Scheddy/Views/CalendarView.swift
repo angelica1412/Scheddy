@@ -36,7 +36,7 @@ struct CalendarView: View {
     }
     
     var body: some View {
-        ZStack(alignment: .bottom) {
+        ZStack(alignment: .bottom){
             VStack(spacing: 12) {
                 // Month header
                 HStack {
@@ -82,55 +82,63 @@ struct CalendarView: View {
                     Spacer()
                 }
                 
-                // Grid of days
-                LazyVGrid(columns: columns, spacing: 8) {
-                    ForEach(["Minggu","Senin","Selasa","Rabu","kamis","Jumat","Sabtu"], id: \.self) { day in
-                        Text(day)
-                            .frame(maxWidth: .infinity)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundColor(day == "Minggu" || day == "Sabtu" ? .hijauMuda : .secondary)
-                    }
+                ZStack(alignment: .top) {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.white)
+                        .frame(width: 1000, height: 550)
                     
-                    ForEach(vm.days) { day in
-                        VStack(spacing: 4) {
-                            if day.isCurrentMonth {
-                                Text(dayFormatter.string(from: day.date))
-                                    .font(.headline)
-                                    .foregroundColor(.primary)
-                                    .frame(width: 70, height: 60)
-                                    .background(
-                                        Calendar.current.isDateInToday(day.date) ?
-                                        Circle().fill(Color.hijauMuda.opacity(0.5)) : nil
-                                    )
-                            }
-                            
-                            ForEach(day.entries) { entry in
-                                switch entry {
-                                case .libur:
-                                    Text("LIBUR")
-                                        .font(.caption.bold())
-                                        .padding(2)
-                                        .frame(maxWidth: .infinity)
-                                        .background(Color.red)
-                                        .foregroundColor(.white)
-                                        .cornerRadius(4)
-                                    
-                                case .group(let group):
-                                    Text(group)
-                                        .font(.caption.bold())
-                                        .padding(2)
-                                        .frame(maxWidth: .infinity)
-                                        .background(Color.red.opacity(0.1))
+                    // Grid of days
+                    LazyVGrid(columns: columns, spacing: 8) {
+                        ForEach(["Minggu","Senin","Selasa","Rabu","kamis","Jumat","Sabtu"], id: \.self) { day in
+                            Text(day)
+                                .frame(maxWidth: .infinity)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(day == "Minggu" || day == "Sabtu" ? .hijauMuda : .secondary)
+                        }
+                        
+                        ForEach(vm.days) { day in
+                            VStack(spacing: 8) {
+                                if day.isCurrentMonth {
+                                    Text(dayFormatter.string(from: day.date))
+                                        .font(.headline)
                                         .foregroundColor(.primary)
-                                        .cornerRadius(4)
+                                        .frame(width: 70, height: 40)
+                                        .background(
+                                            Calendar.current.isDateInToday(day.date) ?
+                                            Circle().fill(Color.hijauMuda.opacity(0.5)) : nil
+                                        )
+                                }
+                                
+                                ForEach(day.entries) { entry in
+                                    switch entry {
+                                    case .libur:
+                                        Text("LIBUR")
+                                            .font(.caption.bold())
+                                            .padding(.vertical, 4)
+                                            .padding(.leading, 6)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .background(Color.backgroundLiburSenin)
+                                            .foregroundColor(.white)
+                                            .cornerRadius(4)
+                                        
+                                    case .group(let group):
+                                        Text(group)
+                                            .font(.caption.bold())
+                                            .padding(.vertical, 4)
+                                            .padding(.leading, 6)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .background(Color.backgroundLiburGroup)
+                                            .foregroundColor(Color.textLiburGroup)
+                                            .cornerRadius(4)
+                                    }
                                 }
                             }
                         }
-                        .frame(minHeight: 70)
-                        .padding(4)
                     }
+                    .frame(maxWidth: 900)
+                    .offset(x: 0, y: 50)
                 }
-                .frame(maxWidth: 1000)
+                
                 Spacer()
             }
             .onAppear {
@@ -158,7 +166,6 @@ struct CalendarView: View {
                 }.offset(x: 0, y: 20)
             }
         }
-        
     }
 }
 

@@ -13,53 +13,56 @@ struct StatusView: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
-                // Segmented Control
-                CustomSegmentedControl(
-                    items: CaddyStatus.allCases,
-                    selection: $viewModel.selectedStatus,
-                    label: { status in
-                        switch status {
-                        case .onField: "On Field"
-                        case .standBy: "Stand-By"
-                        case .done: "Selesai"
+            ZStack {
+                Color.background.ignoresSafeArea()
+                VStack {
+                    // Segmented Control
+                    CustomSegmentedControl(
+                        items: CaddyStatus.allCases,
+                        selection: $viewModel.selectedStatus,
+                        label: { status in
+                            switch status {
+                            case .onField: "On Field"
+                            case .standBy: "Stand-By"
+                            case .done: "Selesai"
+                            }
                         }
+                    )
+                    .padding(.horizontal)
+                    .padding(.top, 20)
+                    
+                    // Konten sesuai status
+                    switch viewModel.selectedStatus {
+                    case .onField:
+                        OnFieldListView(
+                            groupedCaddies: viewModel.groupedCaddiesOnField,
+                            isLoading: viewModel.isLoading,
+                            errorMessage: nil
+                        )
+                    case .standBy:
+                        StandByListView(
+                            groupedCaddies: viewModel.groupedCaddiesStandBy,
+                            isLoading: viewModel.isLoading,
+                            errorMessage: nil
+                        )
+                    case .done:
+                        DoneListView(
+                            groupedCaddies: viewModel.groupedCaddiesDone,
+                            isLoading: viewModel.isLoading,
+                            errorMessage: nil
+                        )
                     }
-                )
-                .padding(.horizontal)
-                .padding(.top, 20)
-
-                // Konten sesuai status
-                switch viewModel.selectedStatus {
-                case .onField:
-                    OnFieldListView(
-                        groupedCaddies: viewModel.groupedCaddiesOnField,
-                        isLoading: viewModel.isLoading,
-                        errorMessage: nil
-                    )
-                case .standBy:
-                    StandByListView(
-                        groupedCaddies: viewModel.groupedCaddiesStandBy,
-                        isLoading: viewModel.isLoading,
-                        errorMessage: nil
-                    )
-                case .done:
-                    DoneListView(
-                        groupedCaddies: viewModel.groupedCaddiesDone,
-                        isLoading: viewModel.isLoading,
-                        errorMessage: nil
-                    )
                 }
-            }
-            .task {
-                await viewModel.loadCaddies()
-            }
-            .onChange(of: viewModel.selectedStatus) { _ in
-                Task { @MainActor in
+                .task {
                     await viewModel.loadCaddies()
                 }
+                .onChange(of: viewModel.selectedStatus) { _ in
+                    Task { @MainActor in
+                        await viewModel.loadCaddies()
+                    }
+                }
+                .padding()
             }
-            .padding()
         }
     }
 }
