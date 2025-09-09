@@ -23,7 +23,6 @@ struct ScheduleMainView: View {
                                        selection: $selectedTab,
                                        label: { $0.rawValue })
                 .padding(.horizontal)
-                .padding(.top, 8)
                 
                 // Konten sesuai tab
                 if selectedTab == .daily {
@@ -35,7 +34,7 @@ struct ScheduleMainView: View {
                 }
                 
                 Spacer()
-            }
+            }.padding()
         }
     }
 }
