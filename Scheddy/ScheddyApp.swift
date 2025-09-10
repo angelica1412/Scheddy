@@ -11,7 +11,7 @@ import SwiftUI
 struct ScheddyApp: App {
     var body: some Scene {
         WindowGroup {
-            StatusView()
+            RootView()
         }
     }
 }

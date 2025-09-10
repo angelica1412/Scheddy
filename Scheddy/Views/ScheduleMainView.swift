@@ -2,8 +2,7 @@
 //  ScheduleMainView.swift
 //  Scheddy
 //
-//  Created by Rafi Abhista  on 03/09/25.
-//
+//  Created by Maria Regina Taufik on 08/09/25.
 
 import SwiftUI
 
