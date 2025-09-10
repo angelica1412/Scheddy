@@ -14,6 +14,7 @@ class CheckOutViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var successMessage: String?
     @Published var checkOutResult: CheckOutData?
+    @Published var updateResult: CheckOutData?
     
     private let service = CheckOutService()
     
@@ -35,12 +36,32 @@ class CheckOutViewModel: ObservableObject {
         defer { isLoading = false }
         do {
             let data = try await service.checkOutCaddy(id: id, jumlahHole: jumlahHole)
-            self.successMessage = "Checkout berhasil untuk \(data.nama_pemain)"
+            let caddyName = self.detail?.caddy.name ?? "Caddy"
+            self.successMessage = "Checkout berhasil untuk \(caddyName)"
             self.checkOutResult = data
             print("Checkout berhasil dikirim ke backend. Response: \(data)")
         } catch {
             self.errorMessage = "Gagal checkout"
             print("Gagal kirim checkout ke backend. Error: \(error.localizedDescription)")
+        }
+    }
+    
+    // Update rekap
+    func updateRekap(id: String, body: UpdateRekapRequest) async {
+        isLoading = true
+        defer { isLoading = false }
+        do {
+            let data = try await service.updateRekap(id: id, body: body)
+            let caddyName = self.detail?.caddy.name ?? "Caddy"
+            self.successMessage = "Update berhasil untuk \(caddyName)"
+            self.updateResult = data
+            print("Update berhasil. jumlah_hole=\(data.jumlah_hole)")
+            if let cid = self.detail?.id_caddy {
+                await self.fetchDetail(caddyId: cid)
+            }
+        } catch {
+            self.errorMessage = error.localizedDescription.isEmpty ? "Gagal update" : error.localizedDescription
+            print("[CheckOutViewModel] Gagal update: \(error.localizedDescription)")
         }
     }
 }

@@ -19,7 +19,7 @@ struct ItemStepper: View {
                 }
             }) {
                 Image(systemName: "minus")
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.body)
                     .foregroundColor(.black)
                     .frame(width: 30, height: 30)
                     .background(Color.gray.opacity(0.2))
@@ -35,7 +35,7 @@ struct ItemStepper: View {
                 count += 1
             }) {
                 Image(systemName: "plus")
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.body)
                     .foregroundColor(.black)
                     .frame(width: 30, height: 30)
                     .background(Color.gray.opacity(0.2))

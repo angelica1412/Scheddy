@@ -54,10 +54,7 @@ struct CheckOutView: View {
         ZStack {
             HStack {
                 Button(action: { showExitAlert = true }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
                         Text("Batal")
-                    }
                     .foregroundColor(.blue)
                 }
                 Spacer()
@@ -96,7 +93,7 @@ struct CheckOutView: View {
                 bagItemsSection(for: detail)
                 
                 // Other Items Section
-                infoRow(label: "Lainnya", value: detail.other_items ?? "Boneka labambu limited edition", isMultiline: true)
+                infoRow(label: "Lainnya", value: detail.other_items ?? "-", isMultiline: true)
             }
             .padding(.horizontal, 20)
             

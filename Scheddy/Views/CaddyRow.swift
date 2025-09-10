@@ -23,7 +23,7 @@ struct CaddyRow: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(Color(UIColor.systemGray6))
+                .fill(Color(UIColor.white))
         )
     }
 }

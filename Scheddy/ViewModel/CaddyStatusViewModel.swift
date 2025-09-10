@@ -29,11 +29,11 @@ class CaddyStatusViewModel: ObservableObject {
         do {
             switch selectedStatus {
             case .standBy:
-                groupedCaddiesStandBy = try await service.fetchStandBy()
+                groupedCaddiesStandBy = try await service.fetchStandBy().filter { !$0.caddies.isEmpty }
             case .onField:
-                groupedCaddiesOnField = try await service.fetchOnField()
+                groupedCaddiesOnField = try await service.fetchOnField().filter { !$0.caddies.isEmpty }
             case .done:
-                groupedCaddiesDone = try await service.fetchDone()
+                groupedCaddiesDone = try await service.fetchDone().filter { !$0.caddies.isEmpty }
             }
         } catch {
             print("Error fetching caddies:", error.localizedDescription)

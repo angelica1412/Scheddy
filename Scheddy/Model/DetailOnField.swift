@@ -56,3 +56,22 @@ struct CheckOutResponse: Codable {
     let message: String
     let data: CheckOutData
 }
+
+// MARK: - Request body untuk PUT /rekap/update/:id
+struct UpdateRekapRequest: Codable {
+    let kode: String
+    let nama_pemain: String
+    let jumlah_hole: Int
+    let booked: Bool
+    let wood_quantity: Int
+    let iron_quantity: Int
+    let putter_quantity: Int
+    let umbrella_quantity: Int
+    let other_items: String?
+}
+
+// MARK: - Response untuk PUT /rekap/update/:id
+struct UpdateRekapResponse: Codable {
+    let message: String
+    let data: CheckOutData
+}
