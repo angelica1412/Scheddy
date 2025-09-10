@@ -32,7 +32,13 @@ struct CheckInView: View {
         VStack {
             ZStack {
                 HStack {
-                    Button(action: { showExitAlert = true }) {
+                    Button(action: {
+                        if hasInputChanges() {
+                            showExitAlert = true
+                        } else {
+                            dismiss()
+                        }
+                    }) {
                             Text("Batal")
                         .foregroundColor(.hijauMuda)
                     }
@@ -246,5 +252,15 @@ struct CheckInView: View {
         } message: {
             Text("Data check-in berhasil tersimpan")
         }
+    }
+    
+    private func hasInputChanges() -> Bool {
+        if !playerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return true }
+        if !playerID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return true }
+        if !otherItem.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return true }
+        if caddyRequest { return true }
+        if wood > 0 || iron > 0 || putter > 0 || umbrella > 0 { return true }
+        if holeCount != 18 { return true }
+        return false
     }
 }

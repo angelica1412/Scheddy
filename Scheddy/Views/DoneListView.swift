@@ -25,14 +25,14 @@ struct DoneListView: View {
                             VStack(spacing: 12) {
                                 ForEach(group.caddies) { caddy in
                                     HStack(spacing: 12) {
-                                        // Left: caddy name
+                                        // Left
                                         Text(caddy.nama.uppercased())
                                             .font(.body)
                                             .foregroundColor(.black)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .padding(.vertical, 12)
 
-                                        // Right: EDIT pill button
+                                        // Right
                                         Button {
                                             selectedCaddyId = caddy.id
                                             showEdit = true
@@ -57,7 +57,7 @@ struct DoneListView: View {
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 4)
                                     .background(Color.white)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                                 }
                             }
                             .padding(.horizontal)
