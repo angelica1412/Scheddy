@@ -33,11 +33,8 @@ struct CheckInView: View {
             ZStack {
                 HStack {
                     Button(action: { showExitAlert = true }) {
-                        HStack {
-                            Image(systemName: "chevron.left")
                             Text("Batal")
-                        }
-                        .foregroundColor(.blue)
+                        .foregroundColor(.hijauMuda)
                     }
                     Spacer()
                 }

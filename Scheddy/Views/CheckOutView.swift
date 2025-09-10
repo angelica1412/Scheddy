@@ -54,10 +54,7 @@ struct CheckOutView: View {
         ZStack {
             HStack {
                 Button(action: { showExitAlert = true }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
                         Text("Batal")
-                    }
                     .foregroundColor(.blue)
                 }
                 Spacer()

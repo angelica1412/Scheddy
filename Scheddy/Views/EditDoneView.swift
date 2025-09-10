@@ -22,6 +22,8 @@ struct EditDoneView: View {
     @State private var umbrellaQty: Int = 0
     @State private var lainnya: String = ""
     @State private var selectedHole: Int? = nil
+    @State private var showExitAlert: Bool = false
+    @State private var showSuccessAlert: Bool = false
     private let holeOptions: [Int] = [9, 18, 27]
     
     var body: some View {
@@ -54,6 +56,21 @@ struct EditDoneView: View {
             prefillFromDetail()
         }
         .id(vm.detail?.id)
+        .alert("Data Belum Tersimpan", isPresented: $showExitAlert) {
+            Button("Keluar", role: .destructive) {
+                dismiss()
+            }
+            Button("Tetap di halaman", role: .cancel) { }
+        } message: {
+            Text("Anda yakin ingin kembali tanpa menyimpan data check-in caddy?")
+        }
+        .alert("Berhasil", isPresented: $showSuccessAlert) {
+            Button("Lanjutkan") {
+                dismiss()
+            }
+        } message: {
+            Text("Data check-in berhasil tersimpan")
+        }
     }
     
     // MARK: - Header
@@ -61,11 +78,14 @@ struct EditDoneView: View {
     private var header: some View {
         ZStack {
             HStack {
-                Button(action: { dismiss() }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
-                        Text("Batal")
+                Button(action: {
+                    if hasUnsavedChanges() {
+                        showExitAlert = true
+                    } else {
+                        dismiss()
                     }
+                }) {
+                        Text("Batal")
                     .foregroundColor(.hijauMuda)
                 }
                 Spacer()
@@ -87,7 +107,7 @@ struct EditDoneView: View {
                 VStack(spacing: 16) {
                     // Nama Caddy
                     infoRow(label: "Nama Caddy", valueView:
-                                Text(vm.detail?.caddy.name.uppercased() ?? "-")
+                                Text(vm.detail?.caddy.name ?? "-")
                         .font(.body)
                         .foregroundColor(.black)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -146,7 +166,6 @@ struct EditDoneView: View {
                     )
                 }
                 .padding()
-                
                 Spacer(minLength: 20)
                 saveButton
                     .padding(.horizontal, 20)
@@ -323,7 +342,7 @@ struct EditDoneView: View {
         )
         await vm.updateRekap(id: id, body: body)
         if vm.errorMessage == nil {
-            dismiss()
+            showSuccessAlert = true
         }
     }
     
@@ -340,6 +359,19 @@ struct EditDoneView: View {
                 Image(systemName: "plus")
             }
         }
+    }
+    private func hasUnsavedChanges() -> Bool {
+        guard let d = vm.detail else { return false }
+        if namaPemain != d.nama_pemain { return true }
+        if kode != d.kode { return true }
+        if (selectedHole ?? jumlahHole) != d.jumlah_hole { return true }
+        if booked != d.booked { return true }
+        if woodQty != d.wood_quantity { return true }
+        if ironQty != d.iron_quantity { return true }
+        if putterQty != d.putter_quantity { return true }
+        if umbrellaQty != d.umbrella_quantity { return true }
+        if lainnya != (d.other_items ?? "") { return true }
+        return false
     }
     private func prefillFromDetail() {
         guard let detail = vm.detail else {
@@ -360,6 +392,6 @@ struct EditDoneView: View {
         umbrellaQty = detail.umbrella_quantity
         lainnya = detail.other_items ?? ""
         selectedHole = jumlahHole
-        print("[EditDoneView] after prefill -> namaPemain=\(namaPemain), kode=\(kode), selectedHole=\(String(describing: selectedHole)))")
+        print("After prefill -> namaPemain=\(namaPemain), kode=\(kode), selectedHole=\(String(describing: selectedHole)))")
     }
 }

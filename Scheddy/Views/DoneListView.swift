@@ -26,8 +26,8 @@ struct DoneListView: View {
                                 ForEach(group.caddies) { caddy in
                                     HStack(spacing: 12) {
                                         // Left: caddy name
-                                        Text(caddy.nama)
-                                            .font(.system(size: 18, weight: .semibold))
+                                        Text(caddy.nama.uppercased())
+                                            .font(.body)
                                             .foregroundColor(.black)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .padding(.vertical, 12)
