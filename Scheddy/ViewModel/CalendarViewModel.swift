@@ -22,12 +22,14 @@ class CalendarMonthViewModel: ObservableObject {
 //    }
 //    
 //    func load(month: Date) async {
+//        print("Load Calendar")
 //        isLoading = true
 //        errorMessage = nil
 //        defer { isLoading = false }
 //        
 //        do {
 //            let calendarList = try await service.fetchCalendar()
+//            print(calendarList)
 //            if let calendarData = calendarList.first {
 //                mapCalendarData(calendarData, for: month)
 //            }
@@ -51,7 +53,7 @@ class CalendarMonthViewModel: ObservableObject {
 //            comps.day = day
 //            if let date = calendar.date(from: comps) {
 //                var entries: [CalendarEntry] = []
-//                
+//
 //                // Tambahkan data libur dari API
 //                if let libur = data.libur.first(where: { calendar.isDate($0.date, inSameDayAs: date) }) {
 //                    entries.append(.libur)
@@ -67,60 +69,67 @@ class CalendarMonthViewModel: ObservableObject {
 //            }
 //        }
 //        
-//        self.days = tempDays
+//        self.days = tempDays.map { day in
+//            var entries: [CalendarEntry] = []
+//            
+//            let weekday = calendar.component(.weekday, from: day.date)
+//            if weekday == 2 { // Monday
+//                entries.append(.libur)
+//            }
+//            
+//            return CalendarDay(date: day.date,
+//                               isCurrentMonth: day.isCurrentMonth,
+//                               entries: entries)
+//        }
 //    }
-
-    func load(month: Date) {
-        let calendar = Calendar.current
-        let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: month))!
-        let range = calendar.range(of: .day, in: .month, for: startOfMonth)!
-        
-        // Build all days of the month
-        var tempDays: [CalendarDay] = []
-        for day in range {
-            var comps = calendar.dateComponents([.year, .month], from: startOfMonth)
-            comps.day = day
-            if let date = calendar.date(from: comps) {
-                tempDays.append(CalendarDay(date: date, isCurrentMonth: true))
-            }
-        }
-        
-        // Pad before to start Sunday
-        if let firstDay = tempDays.first?.date {
-            let weekday = calendar.component(.weekday, from: firstDay) // 1=Sunday
-            let padding = weekday - 1
-            for i in 0..<padding {
-                if let d = calendar.date(byAdding: .day, value: -(padding - i), to: firstDay) {
-                    tempDays.insert(CalendarDay(date: d, isCurrentMonth: false), at: 0)
+    
+        func load(month: Date) {
+            let calendar = Calendar.current
+            let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: month))!
+            let range = calendar.range(of: .day, in: .month, for: startOfMonth)!
+    
+            // Build all days of the month
+            var tempDays: [CalendarDay] = []
+            for day in range {
+                var comps = calendar.dateComponents([.year, .month], from: startOfMonth)
+                comps.day = day
+                if let date = calendar.date(from: comps) {
+                    tempDays.append(CalendarDay(date: date, isCurrentMonth: true))
                 }
             }
+    
+            // Pad before to start Sunday
+            if let firstDay = tempDays.first?.date {
+                let weekday = calendar.component(.weekday, from: firstDay) // 1=Sunday
+                let padding = weekday - 1
+                for i in 0..<padding {
+                    if let d = calendar.date(byAdding: .day, value: -(padding - i), to: firstDay) {
+                        tempDays.insert(CalendarDay(date: d, isCurrentMonth: false), at: 0)
+                    }
+                }
+            }
+    
+            // Inject some mock data
+            self.days = tempDays.map { day in
+                var entries: [CalendarEntry] = []
+    
+                let weekday = calendar.component(.weekday, from: day.date)
+                if weekday == 2 { // Monday
+                    entries.append(.libur)
+                }
+    
+                let dayNum = calendar.component(.day, from: day.date)
+    
+                if [7,14,21,28].contains(dayNum) {
+                    entries.append(.group(name: "Group 3"))
+                }
+                if [2,9,16,23,30].contains(dayNum) {
+                    entries.append(.group(name: "Group 1"))
+                }
+    
+                return CalendarDay(date: day.date,
+                                   isCurrentMonth: day.isCurrentMonth,
+                                   entries: entries)
+            }
         }
-        
-        // Inject some mock data
-        self.days = tempDays.map { day in
-            var entries: [CalendarEntry] = []
-            
-            let weekday = calendar.component(.weekday, from: day.date)
-            if weekday == 2 { // Monday
-                entries.append(.libur)
-            }
-            
-            let dayNum = calendar.component(.day, from: day.date)
-            
-            if [7,14,21,28].contains(dayNum) {
-                entries.append(.group(name: "Group 3"))
-            }
-            if [2,9,16,23,30].contains(dayNum) {
-                entries.append(.group(name: "Group 1"))
-            }
-            //            if [3,10,17,24,31].contains(dayNum) {
-            //                entries.append(.player(name: "Mirna"))
-            //                entries.append(.player(name: "Zahra"))
-            //            }
-            
-            return CalendarDay(date: day.date,
-                               isCurrentMonth: day.isCurrentMonth,
-                               entries: entries)
-        }
-    }
 }

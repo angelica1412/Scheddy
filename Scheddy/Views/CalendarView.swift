@@ -85,7 +85,7 @@ struct CalendarView: View {
                 ZStack(alignment: .top) {
                     RoundedRectangle(cornerRadius: 16)
                         .fill(Color.white)
-                        .frame(width: 1000, height: 550)
+                        .frame(width: 1150, height: 550)
                     
                     // Grid of days
                     LazyVGrid(columns: columns, spacing: 8) {
@@ -135,7 +135,7 @@ struct CalendarView: View {
                             }
                         }
                     }
-                    .frame(maxWidth: 900)
+                    .frame(maxWidth: 1000)
                     .offset(x: 0, y: 50)
                 }
                 
