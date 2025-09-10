@@ -53,7 +53,13 @@ struct CheckOutView: View {
     private var header: some View {
         ZStack {
             HStack {
-                Button(action: { showExitAlert = true }) {
+                Button(action: {
+                    if hasUnsavedChanges() {
+                        showExitAlert = true
+                    } else {
+                        dismiss()
+                    }
+                }) {
                         Text("Batal")
                     .foregroundColor(.blue)
                 }
@@ -289,5 +295,11 @@ struct CheckOutView: View {
             }
         }
         .disabled(viewModel.isLoading || selectedHole == nil)
+    }
+    
+    private func hasUnsavedChanges() -> Bool {
+        // Consider a change if the user has selected a hole.
+        if selectedHole != nil { return true }
+        return false
     }
 }
