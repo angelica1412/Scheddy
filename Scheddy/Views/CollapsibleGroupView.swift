@@ -10,7 +10,7 @@ import SwiftUI
 struct CollapsibleGroup<Content: View>: View {
     let title: String
     @ViewBuilder let content: Content
-    @State private var isExpanded: Bool = true
+    @State private var isExpanded: Bool = false
     
     var body: some View {
         Section {
@@ -32,7 +32,7 @@ struct CollapsibleGroup<Content: View>: View {
                 }
                 .padding(.vertical, 8)
             }
-            .tint(Color.teal)
+            .tint(Color.group)
             .buttonStyle(.borderedProminent)
         }
     }
