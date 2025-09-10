@@ -27,9 +27,8 @@ class CalendarMonthViewModel: ObservableObject {
         defer { isLoading = false }
         
         do {
-            let calendarData = try await service.fetchCalendar()
-            print(calendarData.libur)   // contoh akses libur
-            //            print(calendarData.booking) // contoh akses booking
+            let monthNumber = Calendar.current.component(.month, from: month)
+            let calendarData = try await service.fetchCalendar(month: monthNumber)
             mapCalendarData(calendarData, for: month)
         } catch {
             errorMessage = "Gagal memuat kalender: \(error.localizedDescription)"
@@ -41,7 +40,7 @@ class CalendarMonthViewModel: ObservableObject {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(secondsFromGMT: 0) // karena ada 'Z' (Zulu / UTC)
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
         return formatter
     }()
     
@@ -90,9 +89,11 @@ class CalendarMonthViewModel: ObservableObject {
         self.days = tempDays.map { day in
             var entries = day.entries
             
-            let weekday = calendar.component(.weekday, from: day.date)
-            if weekday == 2 { // Monday
-                entries.append(.libur)
+            if day.isCurrentMonth {
+                let weekday = calendar.component(.weekday, from: day.date)
+                if weekday == 2 { // Monday
+                    entries.append(.libur)
+                }
             }
             
             return CalendarDay(date: day.date,
@@ -101,7 +102,27 @@ class CalendarMonthViewModel: ObservableObject {
         }
     }
     
-    //          Dummy Data
+    func generateLibur(for month: Date) async {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        
+        do {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MM yyyy"
+            let bulanString = formatter.string(from: month)
+            
+            try await service.generateLibur(bulan: bulanString)
+            try await Task.sleep(nanoseconds: 6_000_000_000)
+            
+            // reload kalender setelah generate libur
+            await load(month: month)
+        } catch {
+            errorMessage = "Gagal membuat jadwal libur: \(error.localizedDescription)"
+            print(errorMessage!)
+        }
+    }
+    //        Dummy Data
     //        func load(month: Date) {
     //            let calendar = Calendar.current
     //            let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: month))!

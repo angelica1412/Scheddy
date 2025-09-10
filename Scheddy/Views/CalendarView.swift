@@ -10,6 +10,7 @@ import SwiftUI
 struct CalendarView: View {
     @StateObject private var vm = CalendarMonthViewModel()
     @State private var displayedMonth = Date()
+    @State private var showSuccessAlert = false
     
     let month: Date
     private let columns = Array(repeating: GridItem(.flexible()), count: 7)
@@ -87,58 +88,67 @@ struct CalendarView: View {
                         .fill(Color.white)
                         .frame(width: 850, height: 550)
                     
-                    // Grid of days
-                    LazyVGrid(columns: columns, spacing: 8) {
-                        ForEach(["Minggu","Senin","Selasa","Rabu","kamis","Jumat","Sabtu"], id: \.self) { day in
-                            Text(day)
-                                .frame(maxWidth: .infinity)
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundColor(day == "Minggu" || day == "Sabtu" ? .hijauMuda : .secondary)
-                        }
-                        
-                        ForEach(vm.days) { day in
-                            VStack(spacing: 8) {
-                                if day.isCurrentMonth {
-                                    Text(dayFormatter.string(from: day.date))
-                                        .font(.headline)
-                                        .foregroundColor(.primary)
-                                        .frame(width: 70, height: 40)
-                                        .background(
-                                            Calendar.current.isDateInToday(day.date) ?
-                                            Circle().fill(Color.hijauMuda.opacity(0.5)) : nil
-                                        )
-                                }
-                                
-                                ForEach(day.entries) { entry in
-                                    switch entry {
-                                    case .libur:
-                                        Text("LIBUR")
-                                            .font(.caption.bold())
-                                            .padding(.vertical, 4)
-                                            .padding(.leading, 6)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .background(Color.backgroundLiburSenin)
-                                            .foregroundColor(.white)
-                                            .cornerRadius(4)
-                                        
-                                    case .group(let group):
-                                        Text(group)
-                                            .font(.caption.bold())
-                                            .padding(.vertical, 4)
-                                            .padding(.leading, 6)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .background(Color.backgroundLiburGroup)
-                                            .foregroundColor(Color.textLiburGroup)
-                                            .cornerRadius(4)
+                    if vm.isLoading {
+                        // View loading
+                        ProgressView("Memuat kalender...")
+                            .progressViewStyle(CircularProgressViewStyle(tint: .hijauMuda))
+                            .scaleEffect(1.5)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        // Grid of days
+                        LazyVGrid(columns: columns, spacing: 8) {
+                            ForEach(["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"], id: \.self) { day in
+                                Text(day)
+                                    .frame(maxWidth: .infinity)
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundColor(day == "Minggu" || day == "Sabtu" ? .hijauMuda : .secondary)
+                            }
+                            
+                            ForEach(vm.days) { day in
+                                VStack(spacing: 8) {
+                                    if day.isCurrentMonth {
+                                        Text(dayFormatter.string(from: day.date))
+                                            .font(.headline)
+                                            .foregroundColor(.primary)
+                                            .frame(width: 70, height: 40)
+                                            .background(
+                                                Calendar.current.isDateInToday(day.date) ?
+                                                Circle().fill(Color.hijauMuda.opacity(0.5)) : nil
+                                            )
                                     }
+                                    
+                                    ForEach(day.entries) { entry in
+                                        switch entry {
+                                        case .libur:
+                                            Text("LIBUR")
+                                                .font(.caption.bold())
+                                                .padding(.vertical, 4)
+                                                .padding(.leading, 6)
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                                .background(Color.backgroundLiburSenin)
+                                                .foregroundColor(.white)
+                                                .cornerRadius(4)
+                                            
+                                        case .group(let group):
+                                            Text(group)
+                                                .font(.caption.bold())
+                                                .padding(.vertical, 4)
+                                                .padding(.leading, 6)
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                                .background(Color.backgroundLiburGroup)
+                                                .foregroundColor(Color.textLiburGroup)
+                                                .cornerRadius(4)
+                                        }
+                                    }
+                                    
+                                    Spacer()
                                 }
                             }
                         }
+                        .frame(maxWidth: 800)
+                        .offset(x: 0, y: 50)
                     }
-                    .frame(maxWidth: 800)
-                    .offset(x: 0, y: 50)
                 }
-                
                 Spacer()
             }
             .onAppear {
@@ -154,7 +164,11 @@ struct CalendarView: View {
             
             if !Calendar.current.isDate(displayedMonth, equalTo: currentMonth, toGranularity: .month){
                 Button(action: {
-                    print("Buat Jadwal Libur tapped")
+                    Task {
+                        await vm.generateLibur(for: displayedMonth)
+                        showSuccessAlert = true
+                        await vm.load(month: displayedMonth)
+                    }
                 }) {
                     Text("Buat Jadwal Libur")
                         .font(.headline.weight(.bold))
@@ -163,7 +177,11 @@ struct CalendarView: View {
                         .frame(maxWidth: 500)
                         .background(Color.hijauMuda)
                         .clipShape(Capsule())
-                }.offset(x: 0, y: 20)
+                }
+                .offset(x: 0, y: 20)
+                .alert("Jadwal libur berhasil dibuat", isPresented: $showSuccessAlert) {
+                    Button("OK", role: .cancel) { showSuccessAlert = false }
+                }
             }
         }
     }
