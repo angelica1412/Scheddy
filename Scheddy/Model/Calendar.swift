@@ -31,7 +31,7 @@ struct CalendarDay: Identifiable {
 // Model for Handling Response from API
 struct CalendarResponse: Decodable {
     let message: String
-    let data: [CalendarData]
+    let data: CalendarData
 }
 
 struct CalendarData: Decodable {
@@ -41,15 +41,16 @@ struct CalendarData: Decodable {
 
 struct Libur: Decodable {
     let id: String
-    let date: Date
-    let isRequest: Bool
-    let namaGroup: String
+    let date: String
+    let is_request: Bool
+    let id_caddy_group: String
+    let group_name: String
 }
 
 struct Booking: Decodable {
     let id: String
-    let idCaddy: String
-    let namaCaddy: String
-    let date: Date
+    let id_caddy: String
+    let nama_pemain: String
+    let date: String
+    let caddy_name: String
 }
-
