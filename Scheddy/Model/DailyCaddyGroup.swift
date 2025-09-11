@@ -8,12 +8,18 @@
 struct DailyCaddyGroup: Codable, Equatable, Identifiable {
     var id_group: String
     var group_name: String
-    var allCaddiesDetail: [Caddy]
+    var allCaddiesDetail: [DailyCaddy]
     var shift: String? = "Pagi"
     var notOnFieldCount: Int? = 0
     var group_order: Int? = 0
 
     var id: String { id_group }
+}
+
+struct DailyCaddy: Codable,Identifiable,Equatable,Hashable{
+    let id: String
+    let name: String
+    let status: String?
 }
 
 struct DailyCaddyGroupResponse: Decodable {
@@ -53,9 +59,3 @@ struct ScheduleRequest: Codable {
     }
 }
 
-struct ScheduleItem: Codable {
-    var id_caddy_group: String
-    var urutan: Int
-    var date: Date
-    var shift: String
-}

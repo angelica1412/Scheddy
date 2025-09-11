@@ -73,21 +73,6 @@ struct ScheduleDailyView: View {
                     }
                     VStack {
                         Spacer()
-                        Button {
-                            Task {
-                                await viewModel.loadGeneratedSchedule()
-                            }
-                        } label: {
-                            Text("Print API Result")
-                                .font(.system(size: 18, weight: .bold))
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(Color.blue)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                        }
-                        .padding()
-                        .shadow(radius: 10)
-
                         if isStart {
                             Button {
                                 withAnimation(.spring()) {
@@ -125,7 +110,6 @@ struct ScheduleDailyView: View {
                     }
                 }
                 .navigationTitle("Shift")
-                .background(.white)
                 .task {
                     await viewModel.loadGeneratedSchedule()
                 }
