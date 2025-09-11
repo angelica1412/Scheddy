@@ -28,7 +28,7 @@ struct CaddyGroup: Codable {
     let id: String
 }
 
-struct Caddy: Codable, Identifiable {
+struct Caddy: Codable, Identifiable, Equatable, Hashable {
     let id: String
     let name: String
     let caddy_type: Int
