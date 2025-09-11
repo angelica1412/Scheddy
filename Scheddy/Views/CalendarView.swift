@@ -90,10 +90,12 @@ struct CalendarView: View {
                     
                     if vm.isLoading {
                         // View loading
-                        ProgressView("Memuat kalender...")
-                            .progressViewStyle(CircularProgressViewStyle(tint: .hijauMuda))
-                            .scaleEffect(1.5)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        VStack {
+                            ProgressView("Loading...")
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(12)
+                        }
                     } else {
                         // Grid of days
                         LazyVGrid(columns: columns, spacing: 8) {
