@@ -17,6 +17,11 @@ class CheckInService :APIService {
         req.httpBody = try JSONEncoder().encode(requestData)
         
         let (data, _) = try await URLSession.shared.data(for: req)
+        if let jsonString = String(data: data, encoding: .utf8) {
+                print(jsonString)
+            } else {
+                print("Could not convert data to string.")
+            }
         return try JSONDecoder().decode(CheckInResponse.self, from: data)
     }
 }

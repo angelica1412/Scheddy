@@ -19,7 +19,7 @@ struct OnFieldListView: View {
         ZStack {
             ScrollView {
                 VStack(spacing: 16) {
-                    ForEach(groupedCaddies) { group in
+                    ForEach(groupedCaddies.filter { !$0.caddies.isEmpty }) { group in
                         CollapsibleGroup(title: group.nama) {
                             VStack(spacing: 12) {
                                 ForEach(group.caddies) { caddy in
@@ -52,6 +52,7 @@ struct OnFieldListView: View {
                     }
                 }
                 .padding(.vertical, 4)
+                .padding(.horizontal, 16)
             }
             .sheet(item: $selectedCaddy) { caddy in
                 CheckOutView(caddyId: caddy.id)

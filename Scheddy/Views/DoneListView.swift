@@ -12,6 +12,9 @@ struct DoneListView: View {
     let groupedCaddies: [CaddyGroupGeneric]
     let isLoading: Bool
     let errorMessage: String?
+    @State private var selectedCaddyId: String? = nil
+    @State private var showEdit = false
+    @StateObject private var vm = CheckOutViewModel()
     
     var body: some View {
         ZStack {
@@ -29,19 +32,40 @@ struct DoneListView: View {
                                             id_user: "",
                                             id_caddy_group: "",
                                             urutan: 0
-                                        ),
-                                        showChevron: false
-                                    )
-                                    .background(Color.white)
-                                    .cornerRadius(8)
+                                        )
+                                    ) {
+                                        Button {
+                                            Task {
+                                                selectedCaddyId = caddy.id
+                                                await vm.fetchDetail(caddyId: caddy.id) // fetch first to avoid stale data
+                                                showEdit = true
+                                            }
+                                        } label: {
+                                            HStack(spacing: 6) {
+                                                Image(systemName: "square.and.pencil")
+                                                    .font(.body)
+                                                Text("EDIT")
+                                                    .font(.body)
+                                                    
+                                            }
+                                            .foregroundColor(.white)
+                                            .padding(.vertical, 10)
+                                            .padding(.horizontal, 12)
+                                            .background(Color.hijauMuda)
+                                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 4)
                                 }
                             }
-                            .padding(.vertical, 4)
-                            .padding(.horizontal, 16)
+                            .padding(.horizontal)
                         }
                     }
                 }
-                .padding(.vertical)
+                .padding(.vertical, 4)
+                .padding(.horizontal, 16)
             }
             // Overlay for loading or error
             if isLoading {
@@ -61,6 +85,11 @@ struct DoneListView: View {
                         .background(Color.red)
                         .cornerRadius(12)
                 }
+            }
+        }
+        .sheet(isPresented: $showEdit) {
+            if let _ = selectedCaddyId {
+                EditDoneView(vm: vm)
             }
         }
     }
