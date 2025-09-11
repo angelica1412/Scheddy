@@ -29,76 +29,102 @@ struct CheckInView: View {
     @State private var showSuccessAlert = false
 
     var body: some View {
-        VStack {
-            FormHeader(title: "Check-In") {
-                if hasInputChanges() { showExitAlert = true } else { dismiss() }
-            }
-            
-            ScrollView {
-                VStack(alignment: .leading, spacing: 30) {
-                    VStack(alignment: .leading, spacing: 20) {
-                        // Caddy Name (read-only)
-                        InfoRowSheet(label: "Nama Caddy") {
-                            Text(caddyName)
-                                .font(.body)
-                                .foregroundColor(.black)
+        NavigationStack {
+            VStack {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 30) {
+                        VStack(alignment: .leading, spacing: 20) {
+                            // Caddy Name (read-only)
+                            InfoRowSheet(label: "Nama Caddy") {
+                                Text(caddyName)
+                                    .font(.body)
+                                    .foregroundColor(.black)
+                            }
+
+                            // Player Name
+                            FieldRow(label: "Nama Pemain", text: $playerName, placeholder: "(Contoh: John Doe)")
+
+                            // Player ID
+                            FieldRow(label: "ID Pemain", text: $playerID, keyboard: .numberPad, placeholder: "(Contoh: 123456)")
+
+                            // Caddy Request
+                            ToggleRow(label: "Caddy Request", isOn: $caddyRequest)
+
+                            // Bag Items (editable)
+                            BagItemsEditor(wood: $wood, iron: $iron, putter: $putter, umbrella: $umbrella)
+
+                            // Other Items
+                            OtherItemsRow(text: $otherItem)
                         }
+                        
+                        // Check-In Button
+                        HStack {
+                            Spacer()
+                            PrimaryButton(title: "CHECK-IN", disabled: false, loading: viewModel.isLoading) {
+                                // Validasi input wajib
+                                let trimmedName = playerName.trimmingCharacters(in: .whitespacesAndNewlines)
+                                let trimmedID = playerID.trimmingCharacters(in: .whitespacesAndNewlines)
+                                if trimmedName.isEmpty {
+                                    viewModel.errorMessage = "Nama Pemain wajib diisi"
+                                    viewModel.successMessage = nil
+                                    return
+                                }
+                                if trimmedID.isEmpty {
+                                    viewModel.errorMessage = "ID Pemain wajib diisi"
+                                    viewModel.successMessage = nil
+                                    return
+                                }
 
-                        // Player Name
-                        FieldRow(label: "Nama Pemain", text: $playerName, placeholder: "(Contoh: John Doe)")
+                                // Clear error bila valid
+                                viewModel.errorMessage = nil
 
-                        // Player ID
-                        FieldRow(label: "ID Pemain", text: $playerID, keyboard: .numberPad, placeholder: "(Contoh: 123456)")
+                                // Set ke viewModel
+                                viewModel.playerName = playerName
+                                viewModel.playerID = playerID
+                                viewModel.caddyRequest = caddyRequest
+                                viewModel.wood = wood
+                                viewModel.iron = iron
+                                viewModel.putter = putter
+                                viewModel.umbrella = umbrella
+                                viewModel.otherItem = otherItem
+                                viewModel.holeCount = holeCount
 
-                        // Caddy Request
-                        ToggleRow(label: "Caddy Request", isOn: $caddyRequest)
-
-                        // Bag Items (editable)
-                        BagItemsEditor(wood: $wood, iron: $iron, putter: $putter, umbrella: $umbrella)
-
-                        // Other Items
-                        OtherItemsRow(text: $otherItem)
-                    }
-                    
-                    // Check-In Button
-                    HStack {
-                        Spacer()
-                        PrimaryButton(title: "CHECK-IN", disabled: false, loading: viewModel.isLoading) {
-                            viewModel.playerName = playerName
-                            viewModel.playerID = playerID
-                            viewModel.caddyRequest = caddyRequest
-                            viewModel.wood = wood
-                            viewModel.iron = iron
-                            viewModel.putter = putter
-                            viewModel.umbrella = umbrella
-                            viewModel.otherItem = otherItem
-                            viewModel.holeCount = holeCount
-
-                            Task {
-                                await viewModel.checkInCaddy(idCaddy: caddyId)
-                                if viewModel.successMessage != nil {
-                                    showSuccessAlert = true
+                                Task {
+                                    await viewModel.checkInCaddy(idCaddy: caddyId)
+                                    if viewModel.successMessage != nil {
+                                        showSuccessAlert = true
+                                    }
                                 }
                             }
+                            .frame(maxWidth: 400)
+                            Spacer()
                         }
-                        .frame(maxWidth: 400)
-                        Spacer()
-                    }
 //                    .padding(.top, 20)
-                    
-                    if let error = viewModel.errorMessage {
-                        Text(error)
-                            .foregroundColor(.red)
-                            .font(.footnote)
+                        
+                        if let error = viewModel.errorMessage {
+                            Text(error)
+                                .foregroundColor(.red)
+                                .font(.footnote)
+                        }
+                        
+                        if let success = viewModel.successMessage {
+                            Text(success)
+                                .foregroundColor(.green)
+                                .font(.footnote)
+                        }
                     }
-                    
-                    if let success = viewModel.successMessage {
-                        Text(success)
-                            .foregroundColor(.green)
-                            .font(.footnote)
-                    }
+                    .padding()
                 }
-                .padding()
+            }
+            .navigationTitle("Check-In")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Batal") {
+                        if hasInputChanges() { showExitAlert = true } else { dismiss() }
+                    }
+                    .foregroundColor(.hijauMuda)
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
