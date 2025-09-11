@@ -76,27 +76,9 @@ struct EditDoneView: View {
     // MARK: - Header
     @ViewBuilder
     private var header: some View {
-        ZStack {
-            HStack {
-                Button(action: {
-                    if hasUnsavedChanges() {
-                        showExitAlert = true
-                    } else {
-                        dismiss()
-                    }
-                }) {
-                        Text("Batal")
-                    .foregroundColor(.hijauMuda)
-                }
-                Spacer()
-            }
-            Text("Ubah Check-Out")
-                .font(.headline)
-                .foregroundColor(.black)
+        FormHeader(title: "Ubah Check-Out") {
+            if hasUnsavedChanges() { showExitAlert = true } else { dismiss() }
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 10)
-        .padding(.bottom, 20)
     }
     
     // MARK: - Content wrapper
@@ -104,226 +86,42 @@ struct EditDoneView: View {
     private var content: some View {
         VStack(spacing: 0) {
             ScrollView{
-                VStack(spacing: 16) {
-                    // Nama Caddy
-                    infoRow(label: "Nama Caddy", valueView:
-                                Text(vm.detail?.caddy.name ?? "-")
-                        .font(.body)
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    )
-                    
-                    // Nama Pemain
-                    infoRow(label: "Nama Pemain", valueView:
-                                TextField("Nama Pemain", text: $namaPemain)
-                        .textInputAutocapitalization(.words)
-                        .disableAutocorrection(true)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 14)
-                        .cornerRadius(15)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                        )
-                    )
-                    
-                    // ID Pemain
-                    infoRow(label: "ID Pemain", valueView:
-                                TextField("ID Pemain", text: $kode)
-                        .keyboardType(.numberPad)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 14)
-                        .cornerRadius(15)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                        )
-                    )
-                    
-                    // Jumlah Hole
-                    holeSelectionSection
-                    
-                    // Caddy Request
-                    infoRow(label: "Caddy Request", valueView:
-                                Toggle("", isOn: $booked)
-                        .labelsHidden()
-                    )
-                    
-                    // Bag Items
-                    bagItemsSectionEditable
-                    
-                    // Lainnya
-                    infoRow(label: "Lainnya", isMultiline: true, valueView:
-                                TextField("Lainnya", text: $lainnya, axis: .vertical)
-                        .lineLimit(1...3)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 14)
-                        .cornerRadius(15)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                        )
-                    )
+                VStack(alignment: .leading, spacing: 16) {
+                    // Nama Caddy (read-only, UPPERCASE)
+                    InfoRowSheet(label: "Nama Caddy") {
+                        Text(vm.detail?.caddy.name.uppercased() ?? "-")
+                            .font(.body)
+                            .foregroundColor(.black)
+                    }
+
+                    // Nama Pemain (editable)
+                    FieldRow(label: "Nama Pemain", text: $namaPemain, placeholder: "(Contoh: John Doe)")
+
+                    // ID Pemain (editable)
+                    FieldRow(label: "ID Pemain", text: $kode, keyboard: .numberPad, placeholder: "(Contoh: 123456)")
+
+                    // Jumlah Hole (editable)
+                    HolePicker(selection: $selectedHole)
+
+                    // Caddy Request (editable)
+                    ToggleRow(label: "Caddy Request", isOn: $booked)
+
+                    // Bag Items (editable stepper)
+                    BagItemsEditor(wood: $woodQty, iron: $ironQty, putter: $putterQty, umbrella: $umbrellaQty)
+
+                    // Lainnya (editable multiline)
+                    OtherItemsRow(text: $lainnya)
                 }
-                .padding()
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
                 Spacer(minLength: 20)
-                saveButton
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 30)
-            }
-        }
-    }
-    
-    // MARK: - Reusable info row
-    @ViewBuilder
-    private func infoRow<Content: View>(label: String, isMultiline: Bool = false, valueView: Content) -> some View {
-        HStack(alignment: isMultiline ? .top : .center, spacing: 12) {
-            Text(label)
-                .font(.headline)
-                .foregroundColor(.black)
-                .frame(width: 120, alignment: .leading)
-            valueView
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-    
-    // MARK: - Hole selection
-    @ViewBuilder
-    private var holeSelectionSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if selectedHole == nil {
-                HStack(spacing: 4) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(.red)
-                        .font(.subheadline)
-                    Text("Pilih jumlah hole yang dimainkan")
-                        .foregroundColor(.red)
-                        .font(.subheadline)
+                PrimaryButton(title: "SIMPAN PERUBAHAN", disabled: vm.isLoading, loading: vm.isLoading) {
+                    Task { await save() }
                 }
-                .padding(.bottom, 4)
-            }
-            HStack(alignment: .top, spacing: 12) {
-                Text("Jumlah Hole")
-                    .font(.headline)
-                    .foregroundColor(.black)
-                    .frame(width: 120, alignment: .leading)
-                holePicker
+                .padding(.horizontal, 20)
+                .padding(.bottom, 30)
             }
         }
-        .padding(.vertical, 8)
-    }
-    
-    @ViewBuilder
-    private var holePicker: some View {
-        HStack(spacing: 12) {
-            ForEach(holeOptions, id: \.self) { hole in
-                Button {
-                    selectedHole = hole
-                    jumlahHole = hole
-                } label: {
-                    Text("\(hole)")
-                        .font(.body)
-                        .frame(maxWidth: 120, minHeight: 30)
-                        .background(selectedHole == hole ? Color.hijauMuda : Color.clear)
-                        .foregroundColor(selectedHole == hole ? .white : .black)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(selectedHole == hole ? Color.hijauMuda : Color.gray.opacity(0.3), lineWidth: 1)
-                        )
-                        .cornerRadius(20)
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-    
-    // MARK: - Bag items editable
-    @ViewBuilder
-    private var bagItemsSectionEditable: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Bag Items")
-                .font(.headline)
-                .foregroundColor(.black)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            VStack(spacing: 12) {
-                HStack {
-                    qtyPair(leftTitle: "Wood", leftValue: $woodQty,
-                            rightTitle: "Putter", rightValue: $putterQty)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .padding(.vertical, 8)
-                HStack {
-                    qtyPair(leftTitle: "Iron", leftValue: $ironQty,
-                            rightTitle: "Umbrella", rightValue: $umbrellaQty)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-            .padding(.horizontal, 16)
-        }
-    }
-    
-    @ViewBuilder
-    private func qtyPair(leftTitle: String, leftValue: Binding<Int>, rightTitle: String, rightValue: Binding<Int>) -> some View {
-        HStack {
-            qtyControl(title: leftTitle, value: leftValue)
-            Spacer(minLength: 16)
-            qtyControl(title: rightTitle, value: rightValue)
-        }
-    }
-    
-    private func qtyControl(title: String, value: Binding<Int>) -> some View {
-        HStack(spacing: 10) {
-            Text(title)
-                .font(.body)
-                .foregroundColor(.black)
-                .frame(width: 80, alignment: .leading)
-            Button(action: { value.wrappedValue = max(0, value.wrappedValue - 1) }) {
-                Image(systemName: "minus")
-                    .font(.body)
-                    .foregroundColor(.black)
-                    .frame(width: 30, height: 30)
-                    .background(Color.gray.opacity(0.2))
-                    .clipShape(Rectangle())
-                    .cornerRadius(8)
-            }
-            Text("\(max(0, value.wrappedValue))")
-                .frame(minWidth: 24, alignment: .center)
-            Button(action: { value.wrappedValue += 1 }) {
-                Image(systemName: "plus")
-                    .font(.body)
-                    .foregroundColor(.black)
-                    .frame(width: 30, height: 30)
-                    .background(Color.gray.opacity(0.2))
-                    .clipShape(Rectangle())
-                    .cornerRadius(8)
-            }
-        }
-    }
-    
-    // MARK: - Save button
-    @ViewBuilder
-    private var saveButton: some View {
-        Button {
-            Task { await save() }
-        } label: {
-            if vm.isLoading {
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(Color.gray.opacity(0.3))
-                    .cornerRadius(25)
-            } else {
-                Text("SIMPAN PERUBAHAN")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(Color.hijauMuda)
-                    .cornerRadius(25)
-            }
-        }
-        .disabled(vm.isLoading)
     }
     
     private func save() async {
@@ -346,20 +144,6 @@ struct EditDoneView: View {
         }
     }
     
-    private func qtyRow(title: String, value: Binding<Int>) -> some View {
-        HStack {
-            Text(title)
-            Spacer()
-            Button(action: { value.wrappedValue = max(0, value.wrappedValue - 1) }) {
-                Image(systemName: "minus")
-            }
-            Text("\(value.wrappedValue)")
-                .frame(minWidth: 24)
-            Button(action: { value.wrappedValue += 1 }) {
-                Image(systemName: "plus")
-            }
-        }
-    }
     private func hasUnsavedChanges() -> Bool {
         guard let d = vm.detail else { return false }
         if namaPemain != d.nama_pemain { return true }

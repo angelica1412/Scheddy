@@ -20,7 +20,7 @@ struct CustomSegmentedControl<Selection: Hashable>: View {
                     selection = item
                 } label: {
                     Text(label(item))
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.body)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
                         .foregroundColor(selection == item ? .black : .gray)
