@@ -12,6 +12,38 @@ struct DailyCaddyGroupResponse: Decodable {
     let data: [DynamicCategory]
 }
 
+struct ScheduleRequest: Codable {
+    let id: String
+    let idCaddy: String
+    let kode: String
+    let namaPemain: String
+    let dateTurun: String
+    let booked: Bool
+    let jumlahHole: Int
+    let status: Int
+    let woodQuantity: Int
+    let ironQuantity: Int
+    let putterQuantity: Int
+    let umbrellaQuantity: Int
+    let otherItems: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case idCaddy = "id_caddy"
+        case kode
+        case namaPemain = "nama_pemain"
+        case dateTurun = "date_turun"
+        case booked
+        case jumlahHole = "jumlah_hole"
+        case status
+        case woodQuantity = "wood_quantity"
+        case ironQuantity = "iron_quantity"
+        case putterQuantity = "putter_quantity"
+        case umbrellaQuantity = "umbrella_quantity"
+        case otherItems = "other_items"
+    }
+}
+
 struct DynamicCategory: Decodable {
     let key: String
     let value: CategoryWrapper
@@ -31,14 +63,7 @@ struct DynamicCategory: Decodable {
 }
 
 struct CategoryWrapper: Decodable {
-    let groups: [RawGroup]
-
-    struct RawGroup: Decodable {
-        let group_name: String
-        let notOnFieldCount: Int?
-        let allCaddiesDetail: [Caddy]
-        let group_order: Int?
-    }
+    let groups: [DailyCaddyGroup]
 }
 
 class DailyScheduleService: APIService {
@@ -57,6 +82,33 @@ class DailyScheduleService: APIService {
 
         } catch {
             print("❌ Decoding error: \(error)")
+            throw error
+        }
+    }
+
+    func postSchedule(requestData: ScheduleRequest) async throws -> DailyCaddyGroupResponse {
+        let url = URL(string: "\(baseURL)/schedule/create")!
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = try JSONEncoder().encode(requestData)
+
+        debugPrint("➡️ POST Body:", String(data: req.httpBody ?? Data(), encoding: .utf8) ?? "")
+
+        let (data, response) = try await URLSession.shared.data(for: req)
+
+        guard let httpResponse = response as? HTTPURLResponse,
+              200 ..< 300 ~= httpResponse.statusCode
+        else {
+            throw URLError(.badServerResponse)
+        }
+
+        do {
+            let decoded = try JSONDecoder().decode(DailyCaddyGroupResponse.self, from: data)
+            print("✅ Response: \(decoded.message)")
+            return decoded
+        } catch {
+            print("❌ Post schedule error: \(error)")
             throw error
         }
     }
