@@ -22,7 +22,7 @@ struct InfoRowSheet<Content: View>: View {
             value()
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(.vertical, 8)
+//        .padding(.vertical, 8)
         .overlay(
             Group {
                 if showDivider {
