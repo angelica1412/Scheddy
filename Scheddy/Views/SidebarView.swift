@@ -32,9 +32,9 @@ struct SidebarView: View {
                     Group {
                         HStack {
                             Image(systemName: "clock")
-                                .foregroundColor(selection == "Status" ? .blue : .blue)
+                                .foregroundColor(selection == "Status" ? .hijauMuda : .hijauMuda)
                             Text("Status")
-                                .foregroundColor(selection == "Status" ? .blue : .primary)
+                                .foregroundColor(selection == "Status" ? .hijauMuda : .primary)
                                 .fontWeight(selection == "Status" ? .bold : .regular)
                         }
                         .padding()
@@ -53,9 +53,9 @@ struct SidebarView: View {
                         
                         HStack {
                             Image(systemName: "calendar")
-                                .foregroundColor(selection == "Jadwal" ? .blue : .blue)
+                                .foregroundColor(selection == "Jadwal" ? .hijauMuda : .hijauMuda)
                             Text("Jadwal")
-                                .foregroundColor(selection == "Jadwal" ? .blue : .primary).fontWeight(selection == "Jadwal" ? .bold : .regular)
+                                .foregroundColor(selection == "Jadwal" ? .hijauMuda : .primary).fontWeight(selection == "Jadwal" ? .bold : .regular)
                         }
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
