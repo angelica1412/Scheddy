@@ -24,27 +24,29 @@ struct DoneListView: View {
                         CollapsibleGroup(title: group.nama) {
                             VStack(spacing: 12) {
                                 ForEach(group.caddies) { caddy in
-                                    HStack(spacing: 12) {
-                                        // Left
-                                        Text(caddy.nama.uppercased())
-                                            .font(.body)
-                                            .foregroundColor(.black)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .padding(.vertical, 12)
-
-                                        // Right
+                                    CaddyRow(
+                                        caddy: Caddy(
+                                            id: caddy.id,
+                                            name: caddy.nama,
+                                            caddy_type: 0,
+                                            id_user: "",
+                                            id_caddy_group: "",
+                                            urutan: 0
+                                        )
+                                    ) {
                                         Button {
-                                            selectedCaddyId = caddy.id
-                                            showEdit = true
                                             Task {
-                                                await vm.fetchDetail(caddyId: caddy.id)
+                                                selectedCaddyId = caddy.id
+                                                await vm.fetchDetail(caddyId: caddy.id) // fetch first to avoid stale data
+                                                showEdit = true
                                             }
                                         } label: {
                                             HStack(spacing: 6) {
                                                 Image(systemName: "square.and.pencil")
-                                                    .font(.system(size: 16, weight: .semibold))
+                                                    .font(.body)
                                                 Text("EDIT")
-                                                    .font(.system(size: 14, weight: .bold))
+                                                    .font(.body)
+                                                    
                                             }
                                             .foregroundColor(.white)
                                             .padding(.vertical, 10)
@@ -56,8 +58,6 @@ struct DoneListView: View {
                                     }
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 4)
-                                    .background(Color.white)
-                                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                                 }
                             }
                             .padding(.horizontal)

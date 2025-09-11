@@ -51,55 +51,61 @@ struct CheckOutView: View {
     // MARK: - Subviews
     @ViewBuilder
     private var header: some View {
-        ZStack {
-            HStack {
-                Button(action: {
-                    if hasUnsavedChanges() {
-                        showExitAlert = true
-                    } else {
-                        dismiss()
-                    }
-                }) {
-                        Text("Batal")
-                    .foregroundColor(.blue)
-                }
-                Spacer()
-            }
-            
-            Text("Check-Out")
-                .font(.headline)
-                .foregroundColor(.black)
+        FormHeader(title: "Check-Out") {
+            if hasUnsavedChanges() { showExitAlert = true } else { dismiss() }
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 10)
-        .padding(.bottom, 20)
     }
 
     @ViewBuilder
     private func content(for detail: DetailOnField) -> some View {
         VStack(spacing: 0) {
             // Content sections
-            VStack(spacing: 16) {
-                // Caddy Name Section
-                infoRow(label: "Nama Caddy", value: detail.caddy.name)
-                
-                // Player Name Section
-                infoRow(label: "Nama Pemain", value: detail.nama_pemain)
-                
-                // Player ID Section
-                infoRow(label: "ID Pemain", value: detail.kode)
-                
-                // Hole Selection Section
-                holeSelectionSection
-                
-                // Caddy Request Section
-                infoRow(label: "Caddy Request", value: detail.booked ? "Ya" : "Tidak")
-                
-                // Bag Items Section
-                bagItemsSection(for: detail)
-                
-                // Other Items Section
-                infoRow(label: "Lainnya", value: detail.other_items ?? "-", isMultiline: true)
+            VStack(alignment: .center, spacing: 16) {
+                // Caddy Name
+                InfoRowSheet(label: "Nama Caddy", showDivider: true) {
+                    Text(detail.caddy.name)
+                        .font(.body)
+                        .foregroundColor(.black)
+                }
+
+                // Player Name
+                InfoRowSheet(label: "Nama Pemain", showDivider: true) {
+                    Text(detail.nama_pemain)
+                        .font(.body)
+                        .foregroundColor(.black)
+                }
+
+                // Player ID
+                InfoRowSheet(label: "ID Pemain", showDivider: true) {
+                    Text(detail.kode)
+                        .font(.body)
+                        .foregroundColor(.black)
+                }
+
+                // Hole Selection
+                HolePicker(selection: $selectedHole)
+
+                // Caddy Request
+                InfoRowSheet(label: "Caddy Request", showDivider: true) {
+                    Text(detail.booked ? "Ya" : "Tidak")
+                        .font(.body)
+                        .foregroundColor(.black)
+                }
+
+                // Bag Items (read-only, with its own separators)
+                BagItemsReadOnly(
+                    wood: detail.wood_quantity,
+                    iron: detail.iron_quantity,
+                    putter: detail.putter_quantity,
+                    umbrella: detail.umbrella_quantity
+                )
+
+                // Other Items
+                InfoRowSheet(label: "Lainnya", isMultiline: true, showDivider: true) {
+                    Text(detail.other_items ?? "-")
+                        .font(.body)
+                        .foregroundColor(.black)
+                }
             }
             .padding(.horizontal, 20)
             
@@ -121,154 +127,12 @@ struct CheckOutView: View {
     }
     
     @ViewBuilder
-    private func infoRow(label: String, value: String, isMultiline: Bool = false) -> some View {
-        HStack(alignment: isMultiline ? .top : .center, spacing: 12) {
-            Text(label)
-                .font(.headline)
-                .foregroundColor(.black)
-                .frame(width: 120, alignment: .leading)
-            
-            Text(value)
-                .font(.body)
-                .foregroundColor(.black)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .padding(.vertical, 8)
-        .overlay(
-            Divider()
-                .background(Color.gray.opacity(0.15)),
-            alignment: .bottom
-        )
-    }
-    
-    @ViewBuilder
-    private var holeSelectionSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if selectedHole == nil {
-                HStack(spacing: 4) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(.red)
-                        .font(.subheadline)
-                    Text("Pilih jumlah hole yang dimainkan")
-                        .foregroundColor(.red)
-                        .font(.subheadline)
-                }
-                .padding(.bottom, 4)
-            }
-            
-            HStack(alignment: .top, spacing: 12) {
-                Text("Jumlah Hole")
-                    .font(.headline)
-                    .foregroundColor(.black)
-                    .frame(width: 120, alignment: .leading)
-                
-                holePicker
-            }
-        }
-        .padding(.vertical, 8)
-        .overlay(
-            Divider()
-                .background(Color.gray.opacity(0.15)),
-            alignment: .bottom
-        )
-    }
-
-    @ViewBuilder
-    private var holePicker: some View {
-        HStack(spacing: 12) {
-            ForEach(holeOptions, id: \.self) { hole in
-                Button {
-                    selectedHole = hole
-                } label: {
-                    Text("\(hole)")
-                        .font(.body)
-                        .frame(maxWidth: 120, minHeight: 30)
-                        .multilineTextAlignment(.center)
-                        .background(selectedHole == hole ? Color.hijauMuda : Color.clear)
-                        .foregroundColor(selectedHole == hole ? .white : .black)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(selectedHole == hole ? Color.hijauMuda : Color.gray.opacity(0.3), lineWidth: 1)
-                        )
-                        .cornerRadius(20)
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-    
-    @ViewBuilder
-    private func bagItemsSection(for detail: DetailOnField) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-                Text("Bag Items")
-                    .font(.headline)
-                    .foregroundColor(.black)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 8)
-                    .overlay(
-                        Divider()
-                            .background(Color.gray.opacity(0.15)),
-                        alignment: .bottom
-                    )
-                
-                VStack(spacing: 12) {
-                    HStack {
-                        bagItemRow(label: "Wood", quantity: detail.wood_quantity)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        bagItemRow(label: "Putter", quantity: detail.putter_quantity)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        
-                    }
-                    .padding(.vertical, 8)
-                    .overlay(
-                        Divider()
-                            .background(Color.gray.opacity(0.15)),
-                        alignment: .bottom
-                    )
-                    HStack {
-                        bagItemRow(label: "Iron", quantity: detail.iron_quantity)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        bagItemRow(label: "Umbrella", quantity: detail.umbrella_quantity)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .padding(.vertical, 8)
-                    .overlay(
-                        Divider()
-                            .background(Color.gray.opacity(0.15)),
-                        alignment: .bottom
-                    )
-                }
-                .padding(.horizontal, 16)
-        }
-
-    }
-    
-    @ViewBuilder
-    private func bagItemRow(label: String, quantity: Int) -> some View {
-        HStack (spacing:16) {
-            Text(label)
-                .font(.body)
-                .foregroundColor(.black)
-                .frame(width: 70, alignment: .leading)
-            
-            Text("\(quantity)")
-                .font(.body)
-                .foregroundColor(.black)
-        }
-//        .frame(maxWidth: .infinity, alignment: .leading)
-//        .padding(.vertical, 8)
-//        .background(
-//            VStack {
-//                Spacer()
-//                Divider()
-//                    .background(Color.gray.opacity(0.15))
-//            }
-//        )
-    }
-
-    @ViewBuilder
     private func checkoutButton(detail: DetailOnField) -> some View {
-        Button {
+        PrimaryButton(
+            title: "CHECK-OUT",
+            disabled: selectedHole == nil,
+            loading: viewModel.isLoading
+        ) {
             guard let selectedHole = selectedHole else { return }
             Task {
                 await viewModel.checkOut(id: detail.id, jumlahHole: selectedHole)
@@ -276,25 +140,7 @@ struct CheckOutView: View {
                     showSuccessAlert = true
                 }
             }
-        } label: {
-            if viewModel.isLoading {
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(Color.gray.opacity(0.3))
-                    .cornerRadius(25)
-            } else {
-                Text("CHECK-OUT")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(selectedHole == nil ? Color.gray.opacity(0.5) : Color.hijauMuda)
-                    .cornerRadius(25)
-            }
         }
-        .disabled(viewModel.isLoading || selectedHole == nil)
     }
     
     private func hasUnsavedChanges() -> Bool {

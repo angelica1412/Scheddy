@@ -7,12 +7,14 @@
 
 import SwiftUI
 
-struct ItemStepper: View {
+struct CustomStepper: View {
     var title: String
     @Binding var count: Int
     
     var body: some View {
         HStack(spacing: 15) {
+            Text(title)
+                .frame(width: 80, alignment: .leading)
             Button(action: {
                 if count > 0 {
                     count -= 1
@@ -28,9 +30,8 @@ struct ItemStepper: View {
             }
             
             Text("\(count)")
-                .font(.system(size: 16))
+                .font(.body)
                 .frame(minWidth: 20)
-            
             Button(action: {
                 count += 1
             }) {
