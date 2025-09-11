@@ -26,6 +26,9 @@ struct ScheduleDailyView: View {
                     VStack(alignment: .leading) {
                         if viewModel.isLoading {
                             ProgressView("Loading...")
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(12)
                         } else if let error = viewModel.errorMessage {
                             Text("❌ \(error)")
                                 .foregroundColor(.red)
@@ -109,7 +112,6 @@ struct ScheduleDailyView: View {
                         }
                     }
                 }
-                .navigationTitle("Shift")
                 .task {
                     await viewModel.loadGeneratedSchedule()
                 }

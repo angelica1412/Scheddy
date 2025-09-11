@@ -89,7 +89,7 @@ struct EditDoneView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     // Nama Caddy (read-only, UPPERCASE)
                     InfoRowSheet(label: "Nama Caddy") {
-                        Text(vm.detail?.caddy.name.uppercased() ?? "-")
+                        Text(vm.detail?.caddy.name ?? "-")
                             .font(.body)
                             .foregroundColor(.black)
                     }

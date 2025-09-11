@@ -91,10 +91,13 @@ struct CalendarView: View {
                     if vm.isLoading {
                         // View loading
                         VStack {
+                            Spacer()
                             ProgressView("Loading...")
                                 .padding()
                                 .background(Color.white)
                                 .cornerRadius(12)
+                                .shadow(radius: 8)
+                            Spacer()
                         }
                     } else {
                         // Grid of days
@@ -148,7 +151,7 @@ struct CalendarView: View {
                             }
                         }
                         .frame(maxWidth: 800)
-                        .offset(x: 0, y: 50)
+                        .offset(x: 0, y: 20)
                     }
                 }
                 Spacer()
