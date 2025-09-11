@@ -20,18 +20,18 @@ struct CustomSegmentedControl<Selection: Hashable>: View {
                     selection = item
                 } label: {
                     Text(label(item))
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.body.weight(.medium))
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .foregroundColor(selection == item ? .black : .gray)
+                        .padding(.vertical, 15)
+                        .foregroundColor(selection == item ? Color("SegmentLabel") : .gray)
                         .background(
                             Capsule()
-                                .fill(selection == item ? Color.white : Color.clear)
+                                .fill(selection == item ? Color("Segment") : Color.clear)
                         )
                 }
             }
         }
-        .padding(1)
+        .padding(3)
         .background(
             Capsule().fill(Color(.systemGray5))
         )

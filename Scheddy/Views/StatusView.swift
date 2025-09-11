@@ -59,20 +59,20 @@ struct StatusView: View {
                     await viewModel.loadCaddies()
                 }
             }
-            .padding()
-            .navigationTitle("")
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    VStack(alignment: .leading) {
-                        Text("Status")
-                            .font(.largeTitle.bold())
-                        Text(Date(), style: .date)
-                            .font(.title2)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.top)
-                }
-            }
+//            .padding()
+//            .navigationTitle("")
+//            .toolbar {
+//                ToolbarItem(placement: .topBarLeading) {
+//                    VStack(alignment: .leading) {
+//                        Text("Status")
+//                            .font(.largeTitle.bold())
+//                        Text(Date(), style: .date)
+//                            .font(.title2)
+//                            .foregroundColor(.secondary)
+//                    }
+//                    .padding(.top)
+//                }
+//            }
         }
     }
 }
