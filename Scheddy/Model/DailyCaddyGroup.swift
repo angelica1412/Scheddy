@@ -58,6 +58,7 @@ struct ScheduleRequest: Codable {
     }
 }
 
+
 struct SavedScheduleItem: Codable, Identifiable {
     let id: String
     let urutan: Int
@@ -84,3 +85,4 @@ extension DailyCaddyGroup {
         self.date = saved.date
     }
 }
+

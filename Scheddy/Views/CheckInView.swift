@@ -29,210 +29,102 @@ struct CheckInView: View {
     @State private var showSuccessAlert = false
 
     var body: some View {
-        VStack {
-            ZStack {
-                HStack {
-                    Button(action: {
-                        if hasInputChanges() {
-                            showExitAlert = true
-                        } else {
-                            dismiss()
-                        }
-                    }) {
-                            Text("Batal")
-                        .foregroundColor(.hijauMuda)
-                    }
-                    Spacer()
-                }
-                
-                Text("Check-In")
-                    .font(.headline)
-                    .foregroundColor(.black)
-            }
-            .padding(.horizontal)
-            .padding(.top, 8)
-            .padding(.bottom, 16)
-            
-            ScrollView {
-                VStack(alignment: .leading, spacing: 30) {
-                    VStack(alignment: .leading, spacing: 20) {
-                        // Caddy Name Section
-                        HStack {
-                            Text("Nama Caddy")
-                                .font(.headline)
-                                .bold()
-                                .foregroundColor(.black)
-                                .frame(width: 120, alignment: .leading)
-                            Text(caddyName)
-                                .font(.headline)
-                                .foregroundColor(.black)
+        NavigationStack {
+            VStack {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 30) {
+                        VStack(alignment: .leading, spacing: 20) {
+                            // Caddy Name (read-only)
+                            InfoRowSheet(label: "Nama Caddy") {
+                                Text(caddyName)
+                                    .font(.body)
+                                    .foregroundColor(.black)
+                            }
+
+                            // Player Name
+                            FieldRow(label: "Nama Pemain", text: $playerName, placeholder: "(Contoh: John Doe)")
+
+                            // Player ID
+                            FieldRow(label: "ID Pemain", text: $playerID, keyboard: .numberPad, placeholder: "(Contoh: 123456)")
+
+                            // Caddy Request
+                            ToggleRow(label: "Caddy Request", isOn: $caddyRequest)
+
+                            // Bag Items (editable)
+                            BagItemsEditor(wood: $wood, iron: $iron, putter: $putter, umbrella: $umbrella)
+
+                            // Other Items
+                            OtherItemsRow(text: $otherItem)
                         }
                         
-                        // Player Name Section
+                        // Check-In Button
                         HStack {
-                            Text("Nama Pemain")
-                                .font(.headline)
-                                .bold()
-                                .frame(width: 120, alignment: .leading)
-                            TextField("(Contoh: John Doe)", text: $playerName)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 14)
-                                .cornerRadius(15)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 15)
-                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                )
-                        }
-                        
-                        // Player ID Section
-                        HStack {
-                            Text("ID Pemain")
-                                .font(.headline)
-                                .bold()
-                                .frame(width: 120, alignment: .leading)
-                            TextField("(Contoh: 123456)", text: $playerID)
-                                .keyboardType(.numberPad)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 14)
-                                .cornerRadius(15)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 15)
-                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                )
-                        }
-                        
-                        // Caddy Request Section
-                        HStack {
-                            Text("Caddy Request")
-                                .font(.headline)
-                                .bold()
-                                .frame(width: 120, alignment: .leading)
-                            Toggle("", isOn: $caddyRequest)
-                                .labelsHidden()
-                                .scaleEffect(0.8)
+                            Spacer()
+                            PrimaryButton(title: "CHECK-IN", disabled: false, loading: viewModel.isLoading) {
+                                // Validasi input wajib
+                                let trimmedName = playerName.trimmingCharacters(in: .whitespacesAndNewlines)
+                                let trimmedID = playerID.trimmingCharacters(in: .whitespacesAndNewlines)
+                                if trimmedName.isEmpty {
+                                    viewModel.errorMessage = "Nama Pemain wajib diisi"
+                                    viewModel.successMessage = nil
+                                    return
+                                }
+                                if trimmedID.isEmpty {
+                                    viewModel.errorMessage = "ID Pemain wajib diisi"
+                                    viewModel.successMessage = nil
+                                    return
+                                }
+
+                                // Clear error bila valid
+                                viewModel.errorMessage = nil
+
+                                // Set ke viewModel
+                                viewModel.playerName = playerName
+                                viewModel.playerID = playerID
+                                viewModel.caddyRequest = caddyRequest
+                                viewModel.wood = wood
+                                viewModel.iron = iron
+                                viewModel.putter = putter
+                                viewModel.umbrella = umbrella
+                                viewModel.otherItem = otherItem
+                                viewModel.holeCount = holeCount
+
+                                Task {
+                                    await viewModel.checkInCaddy(idCaddy: caddyId)
+                                    if viewModel.successMessage != nil {
+                                        showSuccessAlert = true
+                                    }
+                                }
+                            }
+                            .frame(maxWidth: 400)
                             Spacer()
                         }
+//                    .padding(.top, 20)
                         
-                        // Bag Items Section
-                        VStack(alignment: .leading, spacing: 20) {
-                            Text("Bag Items")
-                                .font(.headline)
-                                .foregroundColor(.black)
-                            
-                            HStack(spacing: 40) {
-                                // Left Column
-                                VStack(spacing: 15) {
-                                    HStack {
-                                        Text("Wood")
-                                            .font(.body)
-                                            .foregroundColor(.black)
-                                            .frame(width: 80, alignment: .leading)
-                                        ItemStepper(title: "", count: $wood)
-                                    }
-                                    
-                                    HStack {
-                                        Text("Iron")
-                                            .font(.body)
-                                            .foregroundColor(.black)
-                                            .frame(width: 80, alignment: .leading)
-                                        ItemStepper(title: "", count: $iron)
-                                    }
-                                }
-                                Spacer()
-                                // Right Column
-                                VStack(spacing: 15) {
-                                    HStack {
-                                        Text("Putter")
-                                            .font(.body)
-                                            .foregroundColor(.black)
-                                            .frame(width: 80, alignment: .leading)
-                                        ItemStepper(title: "", count: $putter)
-                                    }
-                                    
-                                    HStack {
-                                        Text("Umbrella")
-                                            .font(.body)
-                                            .foregroundColor(.black)
-                                            .frame(width: 80, alignment: .leading)
-                                        ItemStepper(title: "", count: $umbrella)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal, 16)
+                        if let error = viewModel.errorMessage {
+                            Text(error)
+                                .foregroundColor(.red)
+                                .font(.footnote)
                         }
                         
-                        // Other Items Section
-                        HStack {
-                            Text("Lainnya")
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(.black)
-                                .frame(width: 120, alignment: .leading)
-                            TextField("(Contoh: Penutup Stick Golf, x1)", text: $otherItem)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 14)
-                                .cornerRadius(15)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 15)
-                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                )
+                        if let success = viewModel.successMessage {
+                            Text(success)
+                                .foregroundColor(.green)
+                                .font(.footnote)
                         }
                     }
-                    
-                    // Check-In Button
-                    HStack {
-                        Spacer()
-                        Button(action: {
-                            viewModel.playerName = playerName
-                            viewModel.playerID = playerID
-                            viewModel.caddyRequest = caddyRequest
-                            viewModel.wood = wood
-                            viewModel.iron = iron
-                            viewModel.putter = putter
-                            viewModel.umbrella = umbrella
-                            viewModel.otherItem = otherItem
-                            viewModel.holeCount = holeCount
-                            
-                            Task {
-                                await viewModel.checkInCaddy(idCaddy: caddyId)
-                                if viewModel.successMessage != nil {
-                                    showSuccessAlert = true
-                                }
-                            }
-                        }) {
-                            if viewModel.isLoading {
-                                ProgressView()
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(Color.gray.opacity(0.3))
-                                    .cornerRadius(25)
-                            } else {
-                                Text("CHECK-IN")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 16)
-                                    .background(Color.hijauMuda)
-                                    .cornerRadius(40)
-                            }
-                        }
-                        .frame(maxWidth: 400)
-                        Spacer()
-                    }
-                    .padding(.top, 20)
-                    
-                    if let error = viewModel.errorMessage {
-                        Text(error)
-                            .foregroundColor(.red)
-                            .font(.footnote)
-                    }
-                    
-                    if let success = viewModel.successMessage {
-                        Text(success)
-                            .foregroundColor(.green)
-                            .font(.footnote)
-                    }
+                    .padding()
                 }
-                .padding()
+            }
+            .navigationTitle("Check-In")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Batal") {
+                        if hasInputChanges() { showExitAlert = true } else { dismiss() }
+                    }
+                    .foregroundColor(.hijauMuda)
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

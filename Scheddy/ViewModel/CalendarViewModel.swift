@@ -9,6 +9,7 @@
 
 import Foundation
 
+
 @MainActor
 class CalendarMonthViewModel: ObservableObject {
     @Published var days: [CalendarDay] = []
@@ -112,11 +113,13 @@ class CalendarMonthViewModel: ObservableObject {
             formatter.dateFormat = "MM yyyy"
             let bulanString = formatter.string(from: month)
             
-            try await service.generateLibur(bulan: bulanString)
-            try await Task.sleep(nanoseconds: 6_000_000_000)
-            
-            // reload kalender setelah generate libur
-            await load(month: month)
+            let calendarData = try await service.generateLibur(bulan: bulanString)
+
+            if let data = calendarData.data, !data.isEmpty {
+                await load(month: month)
+            } else {
+                print("No data returned from generateLibur")
+            }
         } catch {
             errorMessage = "Gagal membuat jadwal libur: \(error.localizedDescription)"
             print(errorMessage!)

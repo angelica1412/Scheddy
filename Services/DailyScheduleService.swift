@@ -33,6 +33,7 @@ struct ScheduleItemResponse: Codable {
     let shift: Int
 }
 
+
 struct DynamicCategory: Decodable {
     let key: String
     let value: CategoryWrapper

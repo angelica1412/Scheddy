@@ -75,6 +75,7 @@ struct ScheduleDailyView: View {
                     }
                     VStack {
                         Spacer()
+
                         if isStart && !viewModel.isLoading && !viewModel.hasSaved {
                             Button {
                                 withAnimation(.spring()) {

@@ -70,6 +70,7 @@ struct DailyCaddyRow: View {
                 .font(.body)
                 .foregroundColor(.black)
                 .frame(maxWidth: .infinity, alignment: .leading)
+
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
@@ -80,6 +81,7 @@ struct DailyCaddyRow: View {
         )
     }
 }
+
 
 #Preview {
     AccordionGroupView(title: "Oyy", isEdit: true)
