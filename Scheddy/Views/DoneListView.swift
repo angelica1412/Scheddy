@@ -43,44 +43,42 @@ struct DoneListView: View {
                                         )
                                     }
                                     .buttonStyle(.plain)
-                                }
                                     .accessibilityLabel(Text(caddy.nama))
                                     .accessibilityAddTraits(.isButton)
                                     .accessibilityHint(Text("Ketuk dua kali untuk ubah check-out caddy"))
-
+                                }
                             }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
                     }
                 }
+                .padding(.vertical, 4)
+                .padding(.horizontal, 16)
             }
-            .padding(.vertical, 4)
-            .padding(.horizontal, 16)
+            // Overlay for loading or error
+            if isLoading {
+                VStack {
+                    ProgressView("Loading...")
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(12)
+                }
+            } else if let error = errorMessage {
+                Color.black.opacity(0.2)
+                    .ignoresSafeArea()
+                VStack {
+                    Text(error)
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.red)
+                        .cornerRadius(12)
+                }
+            }
         }
-        // Overlay for loading or error
-        if isLoading {
-            VStack {
-                ProgressView("Loading...")
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(12)
-            }
-        } else if let error = errorMessage {
-            Color.black.opacity(0.2)
-                .ignoresSafeArea()
-            VStack {
-                Text(error)
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.red)
-                    .cornerRadius(12)
-            }
-        }
-    }
         .sheet(isPresented: $showEdit) {
             if let _ = selectedCaddyId {
                 EditDoneView(vm: vm)
             }
         }
-}
+    }
 }
