@@ -28,6 +28,7 @@ struct RootView: View {
                     .padding(.top, 50)
                     .padding(.horizontal)
                     .accessibilityAddTraits(.isHeader)
+                    .accessibilitySortPriority(15)
                 
                 Group{
                     if selectedItem == .status {
@@ -42,6 +43,7 @@ struct RootView: View {
                     }
                 }
                 .padding(.horizontal)
+                .accessibilitySortPriority(15)
                 
                 // Sidebar menu
                 VStack(spacing: 8) {
@@ -78,6 +80,7 @@ struct RootView: View {
                     .padding(.horizontal)
                     .padding(.vertical)
                     .frame(maxWidth: .infinity)
+                    .accessibilitySortPriority(0)
                 }
                 .background(Color.background)
                 .cornerRadius(15)
@@ -93,10 +96,13 @@ struct RootView: View {
                 switch selectedItem {
                 case .status:
                     StatusView()
+                        .accessibilitySortPriority(10)
                 case .jadwal:
                     ScheduleMainView()
+                        .accessibilitySortPriority(10)
                 case .fee:
                     FeeMainView()
+                        .accessibilitySortPriority(10)
                 default:
                     Text("Pilih menu di sidebar")
                         .font(.title2)
@@ -145,6 +151,9 @@ struct RootView: View {
                 )
             }
             .buttonStyle(PlainButtonStyle())
+            .accessibilityAddTraits(.isButton)
+            .accessibilityValue(isSelected ? "Dipilih" : "Tidak Dipilih")
+            .accessibilitySortPriority(1)
         }
         
         private func icon(for item: SidebarItem) -> String {

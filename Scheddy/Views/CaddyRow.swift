@@ -44,9 +44,5 @@ struct CaddyRow: View {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(Color(UIColor.white))
         )
-//        .accessibilityElement(children: .combine)
-//        .accessibilityLabel(Text(caddy.name))
-//        .accessibilityAddTraits(.isButton)
-//        .accessibilityHint(Text("Ketuk dua kali untuk mengubah status caddy"))
     }
 }
