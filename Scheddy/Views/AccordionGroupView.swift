@@ -60,18 +60,8 @@ struct AccordionGroupView: View {
 
 struct DailyCaddyRow: View {
     let caddy: DailyCaddy
-    var showChevron: Bool = false
-    var trailing: AnyView? = nil
-    init(caddy: DailyCaddy, showChevron: Bool = true) {
+    init(caddy: DailyCaddy) {
         self.caddy = caddy
-        self.showChevron = showChevron
-        self.trailing = nil
-    }
-
-    init<Content: View>(caddy: DailyCaddy, showChevron: Bool = false, @ViewBuilder trailing: () -> Content) {
-        self.caddy = caddy
-        self.showChevron = showChevron
-        self.trailing = AnyView(trailing())
     }
 
     var body: some View {
@@ -80,13 +70,6 @@ struct DailyCaddyRow: View {
                 .font(.body)
                 .foregroundColor(.black)
                 .frame(maxWidth: .infinity, alignment: .leading)
-
-            if let trailing = trailing {
-                trailing
-            } else if showChevron {
-                Image(systemName: "chevron.right")
-                    .foregroundColor(.gray)
-            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
