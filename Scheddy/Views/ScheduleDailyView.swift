@@ -23,13 +23,8 @@ struct ScheduleDailyView: View {
         NavigationStack {
             ZStack(alignment: .bottom) {
                 ScrollView {
-                    VStack(alignment: .leading) {
-                        if viewModel.isLoading {
-                            ProgressView("Loading...")
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(12)
-                        } else if let error = viewModel.errorMessage {
+                    VStack {
+                        if let error = viewModel.errorMessage {
                             Text("❌ \(error)")
                                 .foregroundColor(.red)
                         } else {
@@ -50,20 +45,24 @@ struct ScheduleDailyView: View {
 
                                         VStack {
                                             ForEach(groupedGroup[shift] ?? [], id: \.id) { caddyGroup in
-                                                AccordionGroupView(title: caddyGroup.group_name, caddies: caddyGroup.allCaddiesDetail, isEdit: isEdit)
-                                                    .onDrag {
-                                                        self.draggedCaddy = caddyGroup
-                                                        return NSItemProvider(object: caddyGroup.id as NSString)
-                                                    }
-                                                    .onDrop(
-                                                        of: [.text],
-                                                        delegate: DropViewDelegate(
-                                                            destinationItem: caddyGroup,
-                                                            caddieGroups: $viewModel.dailyGroups,
-                                                            draggedItem: $draggedCaddy,
-                                                            targetShift: shift
+                                                if !isEdit {
+                                                    AccordionGroupView(title: caddyGroup.group_name, caddies: caddyGroup.allCaddiesDetail, isEdit: isEdit, notOnField: caddyGroup.notOnFieldCount!)
+                                                } else {
+                                                    AccordionGroupView(title: caddyGroup.group_name, caddies: caddyGroup.allCaddiesDetail, isEdit: isEdit, notOnField: caddyGroup.notOnFieldCount!)
+                                                        .onDrag {
+                                                            self.draggedCaddy = caddyGroup
+                                                            return NSItemProvider(object: caddyGroup.id as NSString)
+                                                        }
+                                                        .onDrop(
+                                                            of: [.text],
+                                                            delegate: DropViewDelegate(
+                                                                destinationItem: caddyGroup,
+                                                                caddieGroups: $viewModel.dailyGroups,
+                                                                draggedItem: $draggedCaddy,
+                                                                targetShift: shift
+                                                            )
                                                         )
-                                                    )
+                                                }
                                             }
                                         }
                                     }.fixedSize(horizontal: false, vertical: true)
@@ -74,49 +73,12 @@ struct ScheduleDailyView: View {
                             Spacer()
                         }
                     }
-                    VStack {
-                        Spacer()
-                        if isStart {
-                            Button {
-                                withAnimation(.spring()) {
-                                    isEdit.toggle()
-                                    isStart.toggle()
-                                }
-                            } label: {
-                                Text("Ubah Jadwal")
-                                    .font(.system(size: 22, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .background(Color.teal)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                            }
-                            .padding()
-                            .shadow(radius: 15)
-                        }
-
-                        if isEdit {
-                            Button {
-                                withAnimation(.spring()) {
-                                    showSaveAlert.toggle()
-                                }
-                            } label: {
-                                Text("Simpan Jadwal")
-                                    .font(.system(size: 22, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .background(Color.teal)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                            }
-                            .padding()
-                            .shadow(radius: 15)
-                        }
-                    }
                 }
                 .task {
                     await viewModel.loadGeneratedSchedule()
                 }
                 .toolbar {
-                    if isEdit {
+                    if isEdit && !viewModel.hasSaved {
                         ToolbarItem(placement: .navigationBarTrailing) {
                             Button("Cancel") {
                                 withAnimation(.spring()) {
@@ -130,11 +92,63 @@ struct ScheduleDailyView: View {
                 .alert("Yakin simpan jadwal caddy?", isPresented: $showSaveAlert) {
                     Button("OK", role: .cancel) {
                         isEdit.toggle()
+                        Task {
+                            await viewModel.postSchedule() // ← simpan ke backend
+                        }
                         printScheduleJSON()
                     }
                     Button("Cancel", role: .destructive) {}
                 } message: {
                     Text("Jadwal yang disimpan tidak dapat diubah")
+                }
+                VStack {
+                    Spacer()
+                    if isStart && !viewModel.isLoading && !viewModel.hasSaved {
+                        Button {
+                            withAnimation(.spring()) {
+                                isEdit.toggle()
+                                isStart.toggle()
+                            }
+                        } label: {
+                            Text("Ubah Jadwal")
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.teal)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                        .padding()
+                        .shadow(radius: 15)
+                    }
+
+                    if isEdit && !viewModel.hasSaved {
+                        Button {
+                            withAnimation(.spring()) {
+                                showSaveAlert.toggle()
+                            }
+                        } label: {
+                            Text("Simpan Jadwal")
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.teal)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                        .padding()
+                        .shadow(radius: 15)
+                    }
+                }
+
+                if viewModel.isLoading {
+                    VStack(alignment: .center) {
+                        Spacer()
+                        ProgressView("Loading...")
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(12)
+                            .shadow(radius: 8)
+                        Spacer()
+                    }
                 }
             }
         }
@@ -142,24 +156,15 @@ struct ScheduleDailyView: View {
 }
 
 extension ScheduleDailyView {
-    func shiftCode(from shift: String?) -> Int {
-        switch shift {
-        case "Pagi":
-            return 0
-        case "Siang":
-            return 1
-        default:
-            return 0 // default Pagi kalau nil/unknown
-        }
-    }
-
     func printScheduleJSON() {
-        let today = Date()
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+        let formatter = ISO8601DateFormatter()
+
         let dataToSend: [[String: Any]] = viewModel.dailyGroups.enumerated().map { index, group in
             [
                 "id_caddy_group": group.id_group,
                 "urutan": index + 1,
-                "date": ISO8601DateFormatter().string(from: today),
+                "date": formatter.string(from: tomorrow),
                 "shift": shiftCode(from: group.shift), // ← pakai kode angka
             ]
         }
@@ -219,6 +224,17 @@ struct DropViewDelegate: DropDelegate {
                 }
             }
         }
+    }
+}
+
+func shiftCode(from shift: String?) -> Int {
+    switch shift {
+    case "Pagi":
+        return 0
+    case "Siang":
+        return 1
+    default:
+        return 0 // default Pagi kalau nil/unknown
     }
 }
 

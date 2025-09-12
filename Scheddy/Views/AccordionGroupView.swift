@@ -12,6 +12,7 @@ struct AccordionGroupView: View {
     var caddies: [DailyCaddy] = []
     @State private var isExpanded: Bool = false
     var isEdit: Bool = true
+    var notOnField: Int = 0
 
     var body: some View {
         Section {
@@ -31,6 +32,12 @@ struct AccordionGroupView: View {
                         Text(title.uppercased())
                             .font(.headline)
                         Spacer()
+                        Text(notOnField == 99 ? "Habis libur" : "\(notOnField) belum turun")
+                            .padding(.horizontal)
+                            .padding(.vertical, 5)
+                            .fontWeight(.medium)
+                            .background(notOnField == 99 ? .red : notOnField == 0 ? .green : .yellow)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                         Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
                             .foregroundColor(.white)
                     }
@@ -47,7 +54,7 @@ struct AccordionGroupView: View {
                 } label: {
                     Image(systemName: "line.3.horizontal")
                         .foregroundColor(.teal)
-                        .padding(20)
+                        .padding(25)
                 }
                 .background(Color.teal.opacity(0.2))
                 .background(Color.white)
@@ -60,18 +67,8 @@ struct AccordionGroupView: View {
 
 struct DailyCaddyRow: View {
     let caddy: DailyCaddy
-    var showChevron: Bool = false
-    var trailing: AnyView? = nil
-    init(caddy: DailyCaddy, showChevron: Bool = true) {
+    init(caddy: DailyCaddy) {
         self.caddy = caddy
-        self.showChevron = showChevron
-        self.trailing = nil
-    }
-    
-    init<Content: View>(caddy: DailyCaddy, showChevron: Bool = false, @ViewBuilder trailing: () -> Content) {
-        self.caddy = caddy
-        self.showChevron = showChevron
-        self.trailing = AnyView(trailing())
     }
 
     var body: some View {
@@ -80,13 +77,7 @@ struct DailyCaddyRow: View {
                 .font(.body)
                 .foregroundColor(.black)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            
-            if let trailing = trailing {
-                trailing
-            } else if showChevron {
-                Image(systemName: "chevron.right")
-                    .foregroundColor(.gray)
-            }
+
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)

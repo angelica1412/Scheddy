@@ -22,7 +22,7 @@ struct StatusView: View {
                         selection: $viewModel.selectedStatus,
                         label: { status in
                             switch status {
-                            case .onField: "On Field"
+                            case .onField: "Turun"
                             case .standBy: "Stand-By"
                             case .done: "Selesai"
                             }

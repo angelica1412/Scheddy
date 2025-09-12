@@ -13,6 +13,8 @@ class DailyScheduleViewModel: ObservableObject {
     @Published var categories: [DynamicCategory] = []
     @Published var dailyGroups: [DailyCaddyGroup] = []
     @Published var liburTomorrow: DailyCaddyGroup?
+
+    @Published var hasSaved = false
     @Published var isLoading = false
     @Published var errorMessage: String?
 
@@ -25,21 +27,30 @@ class DailyScheduleViewModel: ObservableObject {
         defer { isLoading = false }
 
         do {
-            let result = try await service.fetchGeneratedSchedule()
-            await MainActor.run {
-                self.categories = result
-                self.mapCategoriesToGroups()
-                print("-------dailyGroups-------")
-                prettyPrint(dailyGroups)
-                print("-----------------")
-                print("-------liburTomorrow-------")
-                prettyPrint([liburTomorrow])
-                print("-----------------")
+            let savedSchedule = try await service.fetchSavedSchedule()
+
+            if savedSchedule.isEmpty {
+                print("ℹ️ Tidak ada jadwal tersimpan, ambil generated...")
+                let result = try await service.fetchGeneratedSchedule()
+
+                await MainActor.run {
+                    self.categories = result
+                    self.mapCategoriesToGroups()
+                }
+            } else {
+                print("✅ Ada jadwal tersimpan untuk besok, pakai saved schedule")
+                hasSaved = true
+
+                await MainActor.run {
+                    self.dailyGroups = savedSchedule.map { DailyCaddyGroup(from: $0) }
+                }
             }
 
-            print("✅ Selesai fetch, total categories:", categories.count)
         } catch {
-            print("Error fetching groups:", error.localizedDescription)
+            print("❌ Error fetching groups:", error.localizedDescription)
+            await MainActor.run {
+                self.errorMessage = error.localizedDescription
+            }
         }
     }
 
@@ -56,8 +67,8 @@ class DailyScheduleViewModel: ObservableObject {
                         id_group: raw.id_group, // kalau API belum ada id_group
                         group_name: raw.group_name.isEmpty ? "Libur Today \(index + 1)" : raw.group_name,
                         allCaddiesDetail: raw.allCaddiesDetail,
-                        shift: index < 4 ? "Pagi" : "Siang", // formasi 4:3
-                        notOnFieldCount: raw.notOnFieldCount,
+                        shift: index < 3 ? "Pagi" : "Siang", // formasi 4:3
+                        notOnFieldCount: 99,
                         group_order: index
                     )
                 }
@@ -69,7 +80,7 @@ class DailyScheduleViewModel: ObservableObject {
                         id_group: raw.id_group,
                         group_name: raw.group_name.isEmpty ? "Generated \(index + 1)" : raw.group_name,
                         allCaddiesDetail: raw.allCaddiesDetail,
-                        shift: index < 4 ? "Pagi" : "Siang",
+                        shift: index < 3 ? "Pagi" : "Siang",
                         notOnFieldCount: raw.notOnFieldCount,
                         group_order: raw.group_order ?? index
                     )
@@ -96,6 +107,30 @@ class DailyScheduleViewModel: ObservableObject {
         // update state
         dailyGroups = newDailyGroups
         liburTomorrow = newLiburTomorrow
+    }
+
+    func postSchedule() async {
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+        let formatter = ISO8601DateFormatter()
+
+        let items = dailyGroups.enumerated().map { index, group in
+            ScheduleItemRequest(
+                id_caddy_group: group.id_group,
+                urutan: index + 1,
+                date: formatter.string(from: tomorrow),
+                shift: shiftCode(from: group.shift)
+            )
+        }
+        print(items)
+
+        isLoading = true
+        do {
+            let response: () = try await service.postSchedule(items: items)
+            print("✅ Post success:")
+        } catch {
+            errorMessage = "Post gagal: \(error.localizedDescription)"
+        }
+        isLoading = false
     }
 }
 

@@ -54,3 +54,9 @@ struct Booking: Decodable {
     let date: String
     let caddy_name: String
 }
+
+//Handling GeneratedLibur Response
+struct GenerateLiburResponse: Codable {
+    let message: String?
+    let data: [String]?
+}

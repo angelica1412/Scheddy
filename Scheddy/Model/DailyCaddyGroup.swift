@@ -4,7 +4,6 @@
 //
 //  Created by Mahardika Putra Wardhana on 11/09/25.
 //
-
 struct DailyCaddyGroup: Codable, Equatable, Identifiable {
     var id_group: String
     var group_name: String
@@ -12,11 +11,11 @@ struct DailyCaddyGroup: Codable, Equatable, Identifiable {
     var shift: String? = "Pagi"
     var notOnFieldCount: Int? = 0
     var group_order: Int? = 0
-
+    var date: String? = nil
     var id: String { id_group }
 }
 
-struct DailyCaddy: Codable,Identifiable,Equatable,Hashable{
+struct DailyCaddy: Codable, Identifiable, Equatable, Hashable {
     let id: String
     let name: String
     let status: String?
@@ -56,6 +55,34 @@ struct ScheduleRequest: Codable {
         case putterQuantity = "putter_quantity"
         case umbrellaQuantity = "umbrella_quantity"
         case otherItems = "other_items"
+    }
+}
+
+
+struct SavedScheduleItem: Codable, Identifiable {
+    let id: String
+    let urutan: Int
+    let date: String
+    let shift: Int
+    let id_caddy_group: String
+    let group_name: String
+    let allCaddiesDetail: [DailyCaddy]
+}
+
+struct SavedScheduleResponse: Codable {
+    let message: String
+    let data: [SavedScheduleItem]
+}
+
+extension DailyCaddyGroup {
+    init(from saved: SavedScheduleItem) {
+        self.id_group = saved.id_caddy_group
+        self.group_name = saved.group_name
+        self.allCaddiesDetail = saved.allCaddiesDetail
+        self.shift = saved.shift == 0 ? "Pagi" : "Siang"
+        self.notOnFieldCount = 0
+        self.group_order = saved.urutan
+        self.date = saved.date
     }
 }
 
