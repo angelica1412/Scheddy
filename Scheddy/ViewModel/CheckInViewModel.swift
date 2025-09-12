@@ -49,7 +49,7 @@ class CheckInViewModel: ObservableObject {
             ironQuantity: iron,
             putterQuantity: putter,
             umbrellaQuantity: umbrella,
-            otherItems: otherItem.isEmpty ? nil : otherItem,
+            otherItems: otherItem.isEmpty ? nil : otherItem
         )
         
         do {
