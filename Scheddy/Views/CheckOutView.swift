@@ -18,15 +18,31 @@ struct CheckOutView: View {
     private let holeOptions: [Int] = [9, 18, 27]
 
     var body: some View {
-        VStack(spacing: 0) {
-            header
-            
-            if let detail = viewModel.detail {
-                content(for: detail)
-            } else {
-                Spacer()
-                ProgressView("Loading...")
-                Spacer()
+        NavigationStack {
+            VStack(spacing: 0) {
+                if let detail = viewModel.detail {
+                    content(for: detail)
+                } else {
+                    VStack {
+                        Spacer()
+                        ProgressView("Loading...")
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(12)
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            }
+            .navigationTitle("Check-Out")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Batal") {
+                        if hasUnsavedChanges() { showExitAlert = true } else { dismiss() }
+                    }
+                    .foregroundColor(.hijauMuda)
+                }
             }
         }
         .alert("Sukses", isPresented: $showSuccessAlert) {
@@ -48,14 +64,6 @@ struct CheckOutView: View {
         }
     }
 
-    // MARK: - Subviews
-    @ViewBuilder
-    private var header: some View {
-        FormHeader(title: "Check-Out") {
-            if hasUnsavedChanges() { showExitAlert = true } else { dismiss() }
-        }
-    }
-
     @ViewBuilder
     private func content(for detail: DetailOnField) -> some View {
         VStack(spacing: 0) {
@@ -67,6 +75,7 @@ struct CheckOutView: View {
                         .font(.body)
                         .foregroundColor(.black)
                 }
+                .padding(.vertical, 16)
 
                 // Player Name
                 InfoRowSheet(label: "Nama Pemain", showDivider: true) {
@@ -74,6 +83,7 @@ struct CheckOutView: View {
                         .font(.body)
                         .foregroundColor(.black)
                 }
+                .padding(.vertical, 16)
 
                 // Player ID
                 InfoRowSheet(label: "ID Pemain", showDivider: true) {
@@ -81,9 +91,11 @@ struct CheckOutView: View {
                         .font(.body)
                         .foregroundColor(.black)
                 }
+                .padding(.vertical, 16)
 
                 // Hole Selection
                 HolePicker(selection: $selectedHole)
+                    .padding(.vertical, 16)
 
                 // Caddy Request
                 InfoRowSheet(label: "Caddy Request", showDivider: true) {
@@ -91,6 +103,7 @@ struct CheckOutView: View {
                         .font(.body)
                         .foregroundColor(.black)
                 }
+                .padding(.vertical, 16)
 
                 // Bag Items (read-only, with its own separators)
                 BagItemsReadOnly(

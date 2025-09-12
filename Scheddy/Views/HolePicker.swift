@@ -10,6 +10,7 @@ import SwiftUI
 struct HolePicker: View {
     let options: [Int] = [9, 18, 27]
     @Binding var selection: Int?
+    var showDivider: Bool = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -50,6 +51,13 @@ struct HolePicker: View {
             }
         }
         .padding(.vertical, 8)
-        .overlay(Divider().background(Color.gray.opacity(0.15)), alignment: .bottom)
+        .overlay(
+            Group {
+                if showDivider {
+                    Divider().background(Color.gray.opacity(0.15))
+                }
+            },
+            alignment: .bottom
+        )
     }
 }

@@ -27,15 +27,25 @@ struct EditDoneView: View {
     private let holeOptions: [Int] = [9, 18, 27]
     
     var body: some View {
-        VStack(spacing: 0) {
-            header
-            
-            if vm.detail != nil {
-                content
-            } else {
-                Spacer()
-                ProgressView("Loading...")
-                Spacer()
+        NavigationStack {
+            VStack(spacing: 0) {
+                if vm.detail != nil {
+                    content
+                } else {
+                    Spacer()
+                    ProgressView("Loading...")
+                    Spacer()
+                }
+            }
+            .navigationTitle("Edit Check-Out")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Batal") {
+                        if hasUnsavedChanges() { showExitAlert = true } else { dismiss() }
+                    }
+                    .foregroundColor(.hijauMuda)
+                }
             }
         }
         .onAppear {
@@ -73,13 +83,6 @@ struct EditDoneView: View {
         }
     }
     
-    // MARK: - Header
-    @ViewBuilder
-    private var header: some View {
-        FormHeader(title: "Ubah Check-Out") {
-            if hasUnsavedChanges() { showExitAlert = true } else { dismiss() }
-        }
-    }
     
     // MARK: - Content wrapper
     @ViewBuilder
@@ -101,7 +104,7 @@ struct EditDoneView: View {
                     FieldRow(label: "ID Pemain", text: $kode, keyboard: .numberPad, placeholder: "(Contoh: 123456)")
 
                     // Jumlah Hole (editable)
-                    HolePicker(selection: $selectedHole)
+                    HolePicker(selection: $selectedHole, showDivider: false)
 
                     // Caddy Request (editable)
                     ToggleRow(label: "Caddy Request", isOn: $booked)
