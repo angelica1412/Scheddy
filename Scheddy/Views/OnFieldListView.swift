@@ -45,6 +45,9 @@ struct OnFieldListView: View {
                                         )
                                     }
                                     .buttonStyle(.plain)
+                                    .accessibilityLabel(Text(caddy.nama))
+                                    .accessibilityAddTraits(.isButton)
+                                    .accessibilityHint(Text("Ketuk dua kali untuk check-out caddy"))
                                 }
                             }
                             .padding(.horizontal)

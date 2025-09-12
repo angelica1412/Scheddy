@@ -34,6 +34,10 @@ struct CollapsibleGroup<Content: View>: View {
             }
             .tint(Color.group)
             .buttonStyle(.borderedProminent)
+            .accessibilityLabel(Text(title))
+            .accessibilityHeading(.unspecified)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityHint(Text("Ketuk dua kali untuk menampilkan atau menyembunyikan daftar caddy."))
         }
     }
 }

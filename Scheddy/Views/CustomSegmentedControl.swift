@@ -29,6 +29,9 @@ struct CustomSegmentedControl<Selection: Hashable>: View {
                                 .fill(selection == item ? Color("Segment") : Color.clear)
                         )
                 }
+                .accessibilityLabel(Text("Tampilan \(label(item))"))
+                .accessibilityAddTraits(.isButton)
+                .accessibilityValue(selection == item ? "Dipilih" : "Tidak Dipilih")
             }
         }
         .padding(3)

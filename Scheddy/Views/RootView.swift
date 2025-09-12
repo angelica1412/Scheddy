@@ -17,6 +17,7 @@ enum SidebarItem: String, CaseIterable, Identifiable {
 
 struct RootView: View {
     @State private var selectedItem: SidebarItem? = .status
+    @ScaledMetric(relativeTo: .body) private var profileImageSize: CGFloat = 44
     
     var body: some View {
         HStack(spacing: 0) {
@@ -26,6 +27,7 @@ struct RootView: View {
                     .font(.largeTitle.bold())
                     .padding(.top, 50)
                     .padding(.horizontal)
+                    .accessibilityAddTraits(.isHeader)
                 
                 Group{
                     if selectedItem == .status {
@@ -39,7 +41,6 @@ struct RootView: View {
                             .hidden()
                     }
                 }
-//                .frame(height: 80)
                 .padding(.horizontal)
                 
                 // Sidebar menu
@@ -56,28 +57,32 @@ struct RootView: View {
                 
                 Spacer()
                 
-//                // Profile section
-//                HStack(spacing: 12) {
-//                    AsyncImage(url: nil) { _ in
-//                        Circle()
-//                            .fill(Color.gray.opacity(0.3))
-//                            .frame(width: 44, height: 44)
-//                            .overlay(
-//                                Image(systemName: "person.fill")
-//                                    .foregroundColor(.gray)
-//                            )
-//                    }
-//                    
-//                    VStack(alignment: .leading, spacing: 2) {
-//                        Text("Willas Tobing")
-//                            .font(.system(size: 15, weight: .semibold))
-//                        Text("Caddy Master")
-//                            .font(.system(size: 13))
-//                            .foregroundColor(.secondary)
-//                    }
-//                    Spacer()
-//                }
-//                .padding()
+                // Profile section
+                Group {
+                    HStack(spacing: 12) {
+                        AsyncImage(url: nil) { _ in
+                            Circle()
+                                .fill(Color.gray.opacity(0.3))
+                                .frame(width: profileImageSize, height: profileImageSize)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Willas Tobing")
+                                .font(.footnote.weight(.semibold))
+                            Text("Caddy Master")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical)
+                    .frame(maxWidth: .infinity)
+                }
+                .background(Color.background)
+                .cornerRadius(15)
+                .padding(.horizontal)
+                .padding(.bottom, 30)
             }
             .padding(.leading)
             .frame(width: 310)
@@ -132,10 +137,10 @@ struct RootView: View {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(isSelected ? Color("Button") : Color.clear)
                         .shadow(
-                            color: isSelected ? Color.black.opacity(0.08) : Color.clear,
-                            radius: isSelected ? 3 : 0,
+                            color: isSelected ? Color.black.opacity(0.1) : Color.clear,
+                            radius: isSelected ? 5 : 0,
                             x: 0,
-                            y: isSelected ? 2 : 0
+                            y: isSelected ? 3 : 0
                         )
                 )
             }
