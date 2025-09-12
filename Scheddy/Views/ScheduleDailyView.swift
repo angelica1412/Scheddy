@@ -46,9 +46,9 @@ struct ScheduleDailyView: View {
                                         VStack {
                                             ForEach(groupedGroup[shift] ?? [], id: \.id) { caddyGroup in
                                                 if !isEdit {
-                                                    AccordionGroupView(title: caddyGroup.group_name, caddies: caddyGroup.allCaddiesDetail, isEdit: isEdit)
+                                                    AccordionGroupView(title: caddyGroup.group_name, caddies: caddyGroup.allCaddiesDetail, isEdit: isEdit, notOnField: caddyGroup.notOnFieldCount!)
                                                 } else {
-                                                    AccordionGroupView(title: caddyGroup.group_name, caddies: caddyGroup.allCaddiesDetail, isEdit: isEdit)
+                                                    AccordionGroupView(title: caddyGroup.group_name, caddies: caddyGroup.allCaddiesDetail, isEdit: isEdit, notOnField: caddyGroup.notOnFieldCount!)
                                                         .onDrag {
                                                             self.draggedCaddy = caddyGroup
                                                             return NSItemProvider(object: caddyGroup.id as NSString)
@@ -71,44 +71,6 @@ struct ScheduleDailyView: View {
                             .padding()
                             .cornerRadius(10)
                             Spacer()
-                        }
-                    }
-                    VStack {
-                        Spacer()
-
-                        if isStart && !viewModel.isLoading && !viewModel.hasSaved {
-                            Button {
-                                withAnimation(.spring()) {
-                                    isEdit.toggle()
-                                    isStart.toggle()
-                                }
-                            } label: {
-                                Text("Ubah Jadwal")
-                                    .font(.system(size: 22, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .background(Color.teal)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                            }
-                            .padding()
-                            .shadow(radius: 15)
-                        }
-
-                        if isEdit && !viewModel.hasSaved {
-                            Button {
-                                withAnimation(.spring()) {
-                                    showSaveAlert.toggle()
-                                }
-                            } label: {
-                                Text("Simpan Jadwal")
-                                    .font(.system(size: 22, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .background(Color.teal)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                            }
-                            .padding()
-                            .shadow(radius: 15)
                         }
                     }
                 }
@@ -139,6 +101,44 @@ struct ScheduleDailyView: View {
                 } message: {
                     Text("Jadwal yang disimpan tidak dapat diubah")
                 }
+                VStack {
+                    Spacer()
+                    if isStart && !viewModel.isLoading && !viewModel.hasSaved {
+                        Button {
+                            withAnimation(.spring()) {
+                                isEdit.toggle()
+                                isStart.toggle()
+                            }
+                        } label: {
+                            Text("Ubah Jadwal")
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.teal)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                        .padding()
+                        .shadow(radius: 15)
+                    }
+
+                    if isEdit && !viewModel.hasSaved {
+                        Button {
+                            withAnimation(.spring()) {
+                                showSaveAlert.toggle()
+                            }
+                        } label: {
+                            Text("Simpan Jadwal")
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.teal)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                        .padding()
+                        .shadow(radius: 15)
+                    }
+                }
+
                 if viewModel.isLoading {
                     VStack(alignment: .center) {
                         Spacer()

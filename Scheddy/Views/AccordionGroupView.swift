@@ -12,6 +12,7 @@ struct AccordionGroupView: View {
     var caddies: [DailyCaddy] = []
     @State private var isExpanded: Bool = false
     var isEdit: Bool = true
+    var notOnField: Int = 0
 
     var body: some View {
         Section {
@@ -31,6 +32,12 @@ struct AccordionGroupView: View {
                         Text(title.uppercased())
                             .font(.headline)
                         Spacer()
+                        Text(notOnField == 99 ? "Habis libur" : "\(notOnField) belum turun")
+                            .padding(.horizontal)
+                            .padding(.vertical, 5)
+                            .fontWeight(.medium)
+                            .background(notOnField == 99 ? .red : notOnField == 0 ? .green : .yellow)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                         Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
                             .foregroundColor(.white)
                     }
@@ -47,7 +54,7 @@ struct AccordionGroupView: View {
                 } label: {
                     Image(systemName: "line.3.horizontal")
                         .foregroundColor(.teal)
-                        .padding(20)
+                        .padding(25)
                 }
                 .background(Color.teal.opacity(0.2))
                 .background(Color.white)
