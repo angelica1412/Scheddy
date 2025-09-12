@@ -57,9 +57,6 @@ struct OnFieldListView: View {
                 .padding(.vertical, 4)
                 .padding(.horizontal, 16)
             }
-            .sheet(item: $selectedCaddy) { caddy in
-                CheckOutView(caddyId: caddy.id)
-            }
 
             // Overlay for loading and error
             if isLoading {
@@ -79,7 +76,11 @@ struct OnFieldListView: View {
                         .background(Color.red)
                         .cornerRadius(12)
                 }
+                
             }
+        }
+        .sheet(item: $selectedCaddy) { caddy in
+            CheckOutView(caddyId: caddy.id)
         }
     }
 }

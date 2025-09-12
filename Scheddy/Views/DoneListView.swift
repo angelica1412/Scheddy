@@ -43,9 +43,11 @@ struct DoneListView: View {
                                         )
                                     }
                                     .buttonStyle(.plain)
+                                }
                                     .accessibilityLabel(Text(caddy.nama))
                                     .accessibilityAddTraits(.isButton)
                                     .accessibilityHint(Text("Ketuk dua kali untuk ubah check-out caddy"))
+
                             }
                         }
                         .padding(.horizontal)
