@@ -68,7 +68,7 @@ class DailyScheduleViewModel: ObservableObject {
                         group_name: raw.group_name.isEmpty ? "Libur Today \(index + 1)" : raw.group_name,
                         allCaddiesDetail: raw.allCaddiesDetail,
                         shift: index < 3 ? "Pagi" : "Siang", // formasi 4:3
-                        notOnFieldCount: raw.notOnFieldCount,
+                        notOnFieldCount: 99,
                         group_order: index
                     )
                 }
