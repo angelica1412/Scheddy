@@ -24,10 +24,14 @@ struct StandByListView: View {
                                 ForEach(group.caddies) { caddy in
                                     Button {
                                         selectedCaddy = caddy
+                                        print (caddy)
                                     } label: {
                                         CaddyRow(caddy: caddy)
                                     }
                                     .buttonStyle(.plain)
+                                    .accessibilityLabel(Text(caddy.name))
+                                    .accessibilityAddTraits(.isButton)
+                                    .accessibilityHint(Text("Ketuk dua kali untuk check-in caddy"))
                                 }
                             }
                             .padding(.horizontal)
@@ -70,3 +74,4 @@ struct StandByListView: View {
         }
     }
 }
+

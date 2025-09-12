@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DoneListView: View {
-  
+    
     let groupedCaddies: [CaddyGroupGeneric]
     let isLoading: Bool
     let errorMessage: String?
@@ -24,73 +24,61 @@ struct DoneListView: View {
                         CollapsibleGroup(title: group.nama) {
                             VStack(spacing: 12) {
                                 ForEach(group.caddies) { caddy in
-                                    CaddyRow(
-                                        caddy: Caddy(
-                                            id: caddy.id,
-                                            name: caddy.nama,
-                                            caddy_type: 0,
-                                            id_user: "",
-                                            id_caddy_group: "",
-                                            urutan: 0
-                                        )
-                                    ) {
-                                        Button {
-                                            Task {
-                                                selectedCaddyId = caddy.id
-                                                await vm.fetchDetail(caddyId: caddy.id) // fetch first to avoid stale data
-                                                showEdit = true
-                                            }
-                                        } label: {
-                                            HStack(spacing: 6) {
-                                                Image(systemName: "square.and.pencil")
-                                                    .font(.body)
-                                                Text("EDIT")
-                                                    .font(.body)
-                                                    
-                                            }
-                                            .foregroundColor(.white)
-                                            .padding(.vertical, 10)
-                                            .padding(.horizontal, 12)
-                                            .background(Color.hijauMuda)
-                                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                                    Button {
+                                        Task {
+                                            selectedCaddyId = caddy.id
+                                            await vm.fetchDetail(caddyId: caddy.id)
+                                            showEdit = true
                                         }
-                                        .buttonStyle(.plain)
+                                    } label: {
+                                        CaddyRow(
+                                            caddy: Caddy(
+                                                id: caddy.id,
+                                                name: caddy.nama,
+                                                caddy_type: 0,
+                                                id_user: "",
+                                                id_caddy_group: "",
+                                                urutan: 0
+                                            )
+                                        )
                                     }
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 4)
-                                }
+                                    .buttonStyle(.plain)
+                                    .accessibilityLabel(Text(caddy.nama))
+                                    .accessibilityAddTraits(.isButton)
+                                    .accessibilityHint(Text("Ketuk dua kali untuk ubah check-out caddy"))
                             }
-                            .padding(.horizontal)
                         }
+                        .padding(.horizontal)
                     }
                 }
-                .padding(.vertical, 4)
-                .padding(.horizontal, 16)
             }
-            // Overlay for loading or error
-            if isLoading {
-                VStack {
-                    ProgressView("Loading...")
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(12)
-                }
-            } else if let error = errorMessage {
-                Color.black.opacity(0.2)
-                    .ignoresSafeArea()
-                VStack {
-                    Text(error)
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(Color.red)
-                        .cornerRadius(12)
-                }
+            .padding(.vertical, 4)
+            .padding(.horizontal, 16)
+        }
+        // Overlay for loading or error
+        if isLoading {
+            VStack {
+                ProgressView("Loading...")
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(12)
+            }
+        } else if let error = errorMessage {
+            Color.black.opacity(0.2)
+                .ignoresSafeArea()
+            VStack {
+                Text(error)
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.red)
+                    .cornerRadius(12)
             }
         }
+    }
         .sheet(isPresented: $showEdit) {
             if let _ = selectedCaddyId {
                 EditDoneView(vm: vm)
             }
         }
-    }
+}
 }
