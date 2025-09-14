@@ -24,6 +24,6 @@ struct Caddies: Decodable {
     let id: String
     let name: String
     let caddy_type: Int
-    let total_holes: Int
+    let total_turun: Int
     let total_fee: Int
 }
