@@ -55,14 +55,14 @@
 //struct FeeMainView: View {
 //    @State var viewModel = CaddyFeeViewModel()
 //    @State private var draggedGroup: CaddyFeeData? = nil
-//    
+//
 //    var groupedGroup: [String: [CaddyFeeData]] {
 //        Dictionary(
 //            grouping: viewModel.caddyFees,
 //            by: { $0.caddy_group_type }
 //        )
 //    }
-//    
+//
 //    @State private var sections: [GroupSection] = DummyData.sections
 //
 //    var body: some View {
@@ -82,7 +82,7 @@
 //                    }
 //                    .padding()
 //                    .cornerRadius(10)
-//                    
+//
 //                    Spacer()
 //                }
 //                .padding(.top, 8)
@@ -126,55 +126,108 @@ import SwiftUI
 struct FeeMainView: View {
     @State private var viewModel = CaddyFeeViewModel()
     
+    @State private var showMonthPicker = false
+    @State private var selectedMonth: Int = Calendar.current.component(.month, from: Date())
+    @State private var selectedYear: String = String(Calendar.current.component(.year, from: Date()))
+    
+    var groupedGroup: [String: [CaddyFeeData]] {
+        Dictionary(grouping: viewModel.caddyFees, by: { $0.caddy_group_type })
+    }
+    
     var body: some View {
         NavigationStack {
-            ZStack {
+            ZStack(alignment: .topTrailing) {
                 Color.background.ignoresSafeArea()
-                ScrollView {
-                    VStack(spacing: 12) {
-                        // Header bulan
-                        HStack {
-                            Text("Agustus 2025") // nanti bisa dinamis
-                                .font(.title2)
-                                .bold()
-                            Spacer()
-                            Button {
-                                // show month picker
-                            } label: {
-                                HStack {
-                                    Text("Bulan")
-                                    Image(systemName: "chevron.down")
-                                }
-                                .foregroundColor(.teal)
+                
+                VStack(spacing: 12) {
+                    // Header bulan
+                    HStack {
+                        Text("\(monthName(for: selectedMonth)) \(selectedYear)")
+                            .font(.title2)
+                            .bold()
+                        Spacer()
+                        Button {
+                            withAnimation {
+                                showMonthPicker.toggle()
                             }
-                        }
-                        .padding(.horizontal)
-                        
-                        if let errorMessage = viewModel.errorMessage {
-                            Text("❌ \(errorMessage)")
-                                .foregroundColor(.red)
-                                .padding()
-                        } else {
-                            ForEach(viewModel.caddyFees, id: \.id_group) { group in
-                                AccordionFeeGroupView(group: group)
+                        } label: {
+                            HStack {
+                                Text("Bulan")
+                                Image(systemName: showMonthPicker ? "chevron.up" : "chevron.down")
                             }
+                            .foregroundColor(Color.hijauMuda)
                         }
                     }
-                    .padding()
+                    .padding(.horizontal, 25)
+                    
+                    // Error state or content
+                    if let errorMessage = viewModel.errorMessage {
+                        Text("\(errorMessage)")
+                            .foregroundColor(.red)
+                            .padding()
+                    } else {
+                        ScrollView {
+                            VStack(spacing: 16) {
+                                ForEach(Array(groupedGroup.keys.sorted()), id: \.self) { caddyGroupType in
+                                    CaddyFeeGroupView(
+                                        type: caddyGroupType,
+                                        groups: groupedGroup[caddyGroupType] ?? []
+                                    )
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                        }
+                    }
+                }
+                .padding(.top)
+                
+                // MonthPicker overlay directly below the button
+                if showMonthPicker {
+                    VStack(alignment: .trailing, spacing: 0) {
+                        Spacer().frame(height: 50)
+                        
+                        MonthPicker(
+                            selectedMonth: $selectedMonth,
+                            selectedYear: $selectedYear,
+                            onSelect: { month, year in
+                                showMonthPicker = false
+                                Task {
+                                    await viewModel.load(monthNumber: month)
+                                }
+                            }
+                        )
+                        .padding(.trailing, 16)
+                        .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
+                        .shadow(radius: 6)
+                        
+                        Spacer()
+                    }
+                    .zIndex(1)
                 }
                 
+                // Loading overlay
                 if viewModel.isLoading {
-                    ProgressView("Loading...")
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(12)
-                        .shadow(radius: 8)
+                    ZStack {
+                        Color.background.ignoresSafeArea()
+                        ProgressView("Loading...")
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(12)
+                            .shadow(radius: 8)
+                    }
+                    .zIndex(3)
                 }
             }
             .task {
-                await viewModel.load(monthNumber: 9)
+                await viewModel.load(monthNumber: selectedMonth)
             }
         }
+    }
+    
+    private func monthName(for month: Int) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "id_ID")
+        return formatter.monthSymbols[month - 1].capitalized
     }
 }
 

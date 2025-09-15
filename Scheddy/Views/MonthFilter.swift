@@ -7,41 +7,70 @@
 
 import SwiftUI
 
-struct MonthFilter: View {
-    private var title: String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "id_ID")
-        formatter.dateFormat = "LLLL yyyy" // Nama bulan panjang + tahun
-        return formatter.string(from: Date())
-    }
-    @State private var showPicker = false
-    @State private var selected = 0
-
+struct MonthPicker: View {
+    @Binding var selectedMonth: Int
+    @Binding var selectedYear: String
+    var onSelect: (Int, String) -> Void
+    
+    private let months = ["JAN", "FEB", "MAR", "APR",
+                          "MEI", "JUN", "JUL", "AGU",
+                          "SEP", "OKT", "NOV", "DES"]
+    
     var body: some View {
-        HStack(alignment: .center) {
-            Text(title)
-                .font(.title.weight(.semibold))
-                .foregroundStyle(.primary)
-
-            Spacer()
-
-            Menu {
-                Picker("Filter", selection: $selected) {
-                    Text("Bulan").tag(0)
-                    Text("Minggu").tag(1)
-                    Text("Hari").tag(2)
+        VStack(spacing: 12) {
+            // Year Header
+            Text("\(selectedYear)")
+                .font(.headline)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.hijauMuda)
+                .cornerRadius(12, corners: [.topLeft, .topRight])
+            
+            // Months grid
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 4), spacing: 12) {
+                ForEach(1...12, id: \.self) { month in
+                    Button {
+                        selectedMonth = month
+                        onSelect(month, selectedYear)
+                    } label: {
+                        Text(months[month - 1])
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(selectedMonth == month ? Color.white : Color.group)
+                            .padding(.vertical, 8)
+                            .frame(maxWidth: .infinity)
+                            .background(selectedMonth == month ? Color.hijauMuda : Color.white)
+                            .cornerRadius(8)
+                    }
                 }
-            } label: {
-                HStack(spacing: 6) {
-                    Text("Bulan")
-                    Image(systemName: "chevron.down")
-                }
-                .font(.callout.weight(.semibold))
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemGray5)))
             }
+            .padding(.horizontal, 8)
+            .padding(.bottom, 12)
         }
-        .padding(.horizontal)
+        .background(Color.background)
+        .cornerRadius(12)
+        .shadow(radius: 4)
+        .frame(maxWidth: 300)
+    }
+}
+
+// Corner radius helper for top-only corners
+extension View {
+    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
+        clipShape( RoundedCorner(radius: radius, corners: corners) )
+    }
+}
+
+struct RoundedCorner: Shape {
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+    
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(path.cgPath)
     }
 }

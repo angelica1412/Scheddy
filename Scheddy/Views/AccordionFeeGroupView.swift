@@ -29,39 +29,28 @@ struct AccordionFeeGroupView: View {
                     HStack {
                         Text(group.group_name.uppercased())
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(.group)
+                        
                         Spacer()
-                        Text(group.caddy_group_type) // "Part-Time" / "Casual"
-                            .padding(.horizontal, 12)
+                        
+                        Text(group.caddy_group_type)
+                            .frame(width: 100)
                             .padding(.vertical, 5)
                             .fontWeight(.medium)
-                            .background(group.caddy_group_type == "Part-Time" ? Color.green : Color.orange)
+                            .background(group.caddy_group_type == "Part-Time" ? Color.hijauMuda : Color.group)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                             .foregroundColor(.white)
                         
-                        Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
-                            .foregroundColor(.white)
+                        Image(systemName: "chevron.down")
+                            .foregroundColor(.group)
                     }
                     .padding(.vertical, 8)
                     .padding(.horizontal, 12)
                     .padding(.trailing, isEdit ? 60 : 0)
                 }
-                .tint(.teal)
+                .tint(.white)
                 .buttonStyle(.borderedProminent)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                
-                if isEdit {
-                    Button {
-                        // action edit fee group
-                    } label: {
-                        Image(systemName: "line.3.horizontal")
-                            .foregroundColor(.teal)
-                            .padding(25)
-                    }
-                    .background(Color.teal.opacity(0.2))
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                }
             }
         }
     }
@@ -76,21 +65,25 @@ struct AccordionFeeRow: View {
                 Text(caddy.name.uppercased())
                     .font(.body)
                     .foregroundColor(.black)
+                
                 Text("\(caddy.total_turun)x Turun")
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.black)
             }
+            
             Spacer()
+            
             Text("Rp \(caddy.total_fee)")
                 .fontWeight(.bold)
-                .foregroundColor(.black)
+                .foregroundColor(Color.secondary)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(Color.white)
         )
+        .padding(.horizontal, 20) // narrower than header row
     }
 }

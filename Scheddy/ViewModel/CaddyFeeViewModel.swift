@@ -27,10 +27,8 @@ class CaddyFeeViewModel {
         do {
             let caddyFeeData = try await service.fetchCaddyFee(month: monthNumber)
             self.caddyFees = caddyFeeData
-            print(caddyFees)
         } catch {
             errorMessage = "Gagal memuat caddy fee: \(error.localizedDescription)"
-            print(errorMessage!)
         }
     }
 }

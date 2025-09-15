@@ -10,10 +10,8 @@ import Foundation
 class CaddyFeeService: APIService{
     func fetchCaddyFee(month: Int) async throws -> [CaddyFeeData] {
         let url = URL(string: "\(baseURL)/fee/get_caddy_fee/\(month)")!
-        print(url)
         let (data, _) = try await URLSession.shared.data(from: url)
         let response = try JSONDecoder().decode(CaddyFeeResponse.self, from: data)
-        //print(response.data)
         return response.data
     }
 }
