@@ -63,7 +63,7 @@ struct AccordionFeeRow: View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(caddy.name.uppercased())
-                    .font(.body)
+                    .font(.body.weight(.medium))
                     .foregroundColor(.black)
                 
                 Text("\(caddy.total_turun)x Turun")
@@ -74,7 +74,7 @@ struct AccordionFeeRow: View {
             Spacer()
             
             Text("Rp \(caddy.total_fee)")
-                .fontWeight(.bold)
+                .font(.body.weight(.regular))
                 .foregroundColor(Color.secondary)
         }
         .padding(.horizontal, 16)

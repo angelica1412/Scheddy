@@ -18,7 +18,7 @@ struct OnFieldListView: View {
     var body: some View {
         ZStack {
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(spacing: 12) {
                     ForEach(groupedCaddies.filter { !$0.caddies.isEmpty }) { group in
                         CollapsibleGroup(title: group.nama) {
                             VStack(spacing: 12) {

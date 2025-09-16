@@ -14,9 +14,9 @@ struct CaddyFeeGroupView: View {
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
             // Vertical rectangle
-            Rectangle()
+            RoundedRectangle(cornerRadius:8)
                 .fill(type == "Part-Time" ? Color.hijauMuda : Color.group)
-                .frame(width: 4)
+                .frame(width: 5)
                 .frame(maxHeight: .infinity, alignment: .top)
                 .padding(.trailing, 8)
             

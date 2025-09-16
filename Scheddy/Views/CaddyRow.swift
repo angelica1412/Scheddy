@@ -26,7 +26,7 @@ struct CaddyRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Text(caddy.name.uppercased())
-                .font(.body)
+                .font(.body.weight(.medium))
                 .foregroundColor(.black)
                 .frame(maxWidth: .infinity, alignment: .leading)
             

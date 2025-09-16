@@ -32,14 +32,13 @@ struct ScheduleDailyView: View {
                                 shift in
                                 VStack(alignment: .leading, spacing: 10) {
                                     Text("Shift \(shift)")
-                                        .font(.headline)
+                                        .font(.title2.bold())
                                         .foregroundColor(.black)
-                                        .padding(.leading, 10)
 
                                     HStack {
-                                        Rectangle()
-                                            .fill(Color.teal.opacity(0.7))
-                                            .frame(width: 4)
+                                        RoundedRectangle(cornerRadius:8)
+                                            .fill(Color.hijauMuda.opacity(0.7))
+                                            .frame(width: 5)
                                             .frame(maxHeight: .infinity, alignment: .top)
                                             .padding(.trailing, 8)
 
@@ -114,11 +113,12 @@ struct ScheduleDailyView: View {
                                 .font(.system(size: 22, weight: .bold))
                                 .foregroundColor(.white)
                                 .padding()
-                                .background(Color.teal)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .padding(.horizontal, 80)
+                                .background(Color.hijauMuda)
+                                .clipShape(RoundedRectangle(cornerRadius: 30))
                         }
                         .padding()
-                        .shadow(radius: 15)
+                        .shadow(color: Color.black.opacity(0.1), radius: 3)
                     }
 
                     if isEdit && !viewModel.hasSaved {
@@ -131,11 +131,11 @@ struct ScheduleDailyView: View {
                                 .font(.system(size: 22, weight: .bold))
                                 .foregroundColor(.white)
                                 .padding()
-                                .background(Color.teal)
+                                .background(Color.hijauMuda)
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
                         .padding()
-                        .shadow(radius: 15)
+                        .shadow(color: Color.black.opacity(0.1), radius: 3)
                     }
                 }
 
@@ -146,7 +146,7 @@ struct ScheduleDailyView: View {
                             .padding()
                             .background(Color.white)
                             .cornerRadius(12)
-                            .shadow(radius: 8)
+                            .shadow(color: Color.black.opacity(0.1), radius: 3)
                         Spacer()
                     }
                 }

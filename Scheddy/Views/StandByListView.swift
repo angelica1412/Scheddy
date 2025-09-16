@@ -17,7 +17,7 @@ struct StandByListView: View {
     var body: some View {
         ZStack {
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(spacing: 12) {
                     ForEach(groupedCaddies) { group in
                         CollapsibleGroup(title: group.caddy_group.group_name) {
                             VStack(spacing: 12) {

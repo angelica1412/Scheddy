@@ -23,7 +23,8 @@ struct ScheduleMainView: View {
                     CustomSegmentedControl(items: Tab.allCases,
                                            selection: $selectedTab,
                                            label: { $0.rawValue })
-                    .padding(.horizontal)
+                    .padding(.horizontal,50)
+                    .padding(.top, 20)
                     
                     // Konten sesuai tab
                     if selectedTab == .daily {

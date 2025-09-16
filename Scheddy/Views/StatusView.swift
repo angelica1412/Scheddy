@@ -28,7 +28,7 @@ struct StatusView: View {
                             }
                         }
                     )
-                    .padding(.horizontal)
+                    .padding(.horizontal,50)
                     .padding(.top, 20)
                     
                     // Konten sesuai status
@@ -39,18 +39,21 @@ struct StatusView: View {
                             isLoading: viewModel.isLoading,
                             errorMessage: nil
                         )
+                        .padding(.top, 24)
                     case .standBy:
                         StandByListView(
                             groupedCaddies: viewModel.groupedCaddiesStandBy,
                             isLoading: viewModel.isLoading,
                             errorMessage: nil
                         )
+                        .padding(.top, 24)
                     case .done:
                         DoneListView(
                             groupedCaddies: viewModel.groupedCaddiesDone,
                             isLoading: viewModel.isLoading,
                             errorMessage: nil
                         )
+                        .padding(.top, 24)
                     }
                 }
                 .task {

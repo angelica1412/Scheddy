@@ -26,19 +26,24 @@ struct CollapsibleGroup<Content: View>: View {
                 HStack {
                     Text(title.uppercased())
                         .font(.headline)
+                        .foregroundColor(.white)
                     Spacer()
                     Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
                         .foregroundColor(.white)
                 }
-                .padding(.vertical, 8)
+                .padding(.vertical, 14)
+                .padding(.horizontal, 16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.group)
+                .cornerRadius(12)
             }
-            .tint(Color.group)
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.plain)
             .accessibilityLabel(Text(title))
             .accessibilityHeading(.unspecified)
             .accessibilityAddTraits(.isButton)
             .accessibilityHint(Text("Ketuk dua kali untuk menampilkan atau menyembunyikan daftar caddy."))
         }
+        .padding(.horizontal)
     }
 }
 
