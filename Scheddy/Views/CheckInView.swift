@@ -28,6 +28,9 @@ struct CheckInView: View {
     @State private var showExitAlert = false
     @State private var showSuccessAlert = false
 
+    // Optional callback: dipanggil saat check-in sukses (untuk refresh list di parent)
+    var onSuccess: (() async -> Void)? = nil
+
     var body: some View {
         NavigationStack {
             VStack {
@@ -139,7 +142,10 @@ struct CheckInView: View {
         }
         .alert("Berhasil", isPresented: $showSuccessAlert) {
             Button("Lanjutkan") {
-                dismiss()
+                Task {
+                    await onSuccess?()
+                    dismiss()
+                }
             }
         } message: {
             Text("Data check-in berhasil tersimpan")

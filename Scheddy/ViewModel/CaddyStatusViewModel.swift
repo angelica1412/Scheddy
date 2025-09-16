@@ -30,6 +30,7 @@ class CaddyStatusViewModel: ObservableObject {
             switch selectedStatus {
             case .standBy:
                 groupedCaddiesStandBy = try await service.fetchStandBy().filter { !$0.caddies.isEmpty }
+                print ("lagi load standby")
             case .onField:
                 groupedCaddiesOnField = try await service.fetchOnField().filter { !$0.caddies.isEmpty }
             case .done:

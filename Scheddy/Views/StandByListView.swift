@@ -11,8 +11,15 @@ struct StandByListView: View {
     let groupedCaddies: [CaddyGroupData]
     let isLoading: Bool
     let errorMessage: String?
+   
+    var onCheckInSuccess: (() async -> Void)? = nil
 
     @State private var selectedCaddy: Caddy? = nil
+    @State private var hiddenCaddyIDs: Set<String> = []
+
+    private func hideCaddy(_ id: String) {
+        hiddenCaddyIDs.insert(id)
+    }
 
     var body: some View {
         ZStack {
@@ -21,7 +28,7 @@ struct StandByListView: View {
                     ForEach(groupedCaddies) { group in
                         CollapsibleGroup(title: group.caddy_group.group_name) {
                             VStack(spacing: 12) {
-                                ForEach(group.caddies) { caddy in
+                                ForEach(group.caddies.filter { !hiddenCaddyIDs.contains($0.id) }) { caddy in
                                     Button {
                                         selectedCaddy = caddy
                                         print (caddy)
@@ -69,9 +76,12 @@ struct StandByListView: View {
         .sheet(item: $selectedCaddy) { caddy in
             CheckInView(
                 caddyId: caddy.id,
-                caddyName: caddy.name
+                caddyName: caddy.name,
+                onSuccess: {
+                    hideCaddy(caddy.id)
+                    await onCheckInSuccess?()
+                }
             )
         }
     }
 }
-
