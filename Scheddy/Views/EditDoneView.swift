@@ -93,7 +93,7 @@ struct EditDoneView: View {
                     // Nama Caddy (read-only, UPPERCASE)
                     InfoRowSheet(label: "Nama Caddy") {
                         Text(vm.detail?.caddy.name ?? "-")
-                            .font(.body)
+                            .font(.body.weight(.medium))
                             .foregroundColor(.black)
                     }
 

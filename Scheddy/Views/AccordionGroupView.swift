@@ -31,15 +31,17 @@ struct AccordionGroupView: View {
                     HStack {
                         Text(title.uppercased())
                             .font(.headline)
+                            .foregroundColor(.group)
                         Spacer()
                         Text(notOnField == 99 ? "Habis libur" : "\(notOnField) belum turun")
                             .padding(.horizontal)
                             .padding(.vertical, 5)
                             .fontWeight(.medium)
-                            .background(notOnField == 99 ? .red : notOnField == 0 ? .green : .yellow)
+                            .background(notOnField == 99 ? .labelRed : notOnField == 0 ? .hijauMuda : .labelYellow)
+                            .foregroundColor(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                         Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
-                            .foregroundColor(.white)
+                            .foregroundColor(.group)
                     }
                     .padding(.vertical, 8)
                     .padding(.horizontal, 12)
@@ -53,10 +55,10 @@ struct AccordionGroupView: View {
                     // action edit
                 } label: {
                     Image(systemName: "line.3.horizontal")
-                        .foregroundColor(.teal)
-                        .padding(25)
+                        .foregroundColor(.buttonLabel)
+                        .padding(18)
                 }
-                .background(Color.teal.opacity(0.2))
+                .background(Color.hijauMuda.opacity(0.5))
                 .background(Color.white)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
                 .opacity(isEdit ? 1 : 0)
@@ -74,7 +76,7 @@ struct DailyCaddyRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Text(caddy.name.uppercased())
-                .font(.body)
+                .font(.body.weight(.medium))
                 .foregroundColor(.black)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -91,5 +93,11 @@ struct DailyCaddyRow: View {
 
 
 #Preview {
-    AccordionGroupView(title: "Oyy", isEdit: true)
+    VStack{
+        AccordionGroupView(title: "Oyy", isEdit: true)
+        AccordionGroupView(title: "Oyy", isEdit: true)
+        AccordionGroupView(title: "Oyy", isEdit: true)
+
+    }.background(.gray)
+    
 }

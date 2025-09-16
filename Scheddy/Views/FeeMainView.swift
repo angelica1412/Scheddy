@@ -198,7 +198,7 @@ struct FeeMainView: View {
                         )
                         .padding(.trailing, 16)
                         .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
-                        .shadow(radius: 6)
+                        .shadow(color: Color.black.opacity(0.1), radius: 3)
                         
                         Spacer()
                     }
@@ -213,7 +213,7 @@ struct FeeMainView: View {
                             .padding()
                             .background(Color.white)
                             .cornerRadius(12)
-                            .shadow(radius: 8)
+                            .shadow(color: Color.black.opacity(0.1), radius: 3)
                     }
                     .zIndex(3)
                 }

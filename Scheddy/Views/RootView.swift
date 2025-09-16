@@ -60,32 +60,32 @@ struct RootView: View {
                 Spacer()
                 
                 // Profile section
-                Group {
-                    HStack(spacing: 12) {
-                        AsyncImage(url: nil) { _ in
-                            Circle()
-                                .fill(Color.gray.opacity(0.3))
-                                .frame(width: profileImageSize, height: profileImageSize)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Willas Tobing")
-                                .font(.footnote.weight(.semibold))
-                            Text("Caddy Master")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        Spacer()
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical)
-                    .frame(maxWidth: .infinity)
-                    .accessibilitySortPriority(0)
-                }
-                .background(Color.background)
-                .cornerRadius(15)
-                .padding(.horizontal)
-                .padding(.bottom, 30)
+//                Group {
+//                    HStack(spacing: 12) {
+//                        AsyncImage(url: nil) { _ in
+//                            Circle()
+//                                .fill(Color.gray.opacity(0.3))
+//                                .frame(width: profileImageSize, height: profileImageSize)
+//                        }
+//                        
+//                        VStack(alignment: .leading, spacing: 2) {
+//                            Text("Willas Tobing")
+//                                .font(.footnote.weight(.semibold))
+//                            Text("Caddy Master")
+//                                .font(.caption)
+//                                .foregroundColor(.secondary)
+//                        }
+//                        Spacer()
+//                    }
+//                    .padding(.horizontal)
+//                    .padding(.vertical)
+//                    .frame(maxWidth: .infinity)
+//                    .accessibilitySortPriority(0)
+//                }
+//                .background(Color.background)
+//                .cornerRadius(15)
+//                .padding(.horizontal)
+//                .padding(.bottom, 30)
             }
             .padding(.leading)
             .frame(width: 310)

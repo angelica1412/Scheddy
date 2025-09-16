@@ -49,7 +49,7 @@ struct MonthPicker: View {
         }
         .background(Color.background)
         .cornerRadius(12)
-        .shadow(radius: 4)
+        .shadow(color: Color.black.opacity(0.1), radius: 3)
         .frame(maxWidth: 300)
     }
 }
