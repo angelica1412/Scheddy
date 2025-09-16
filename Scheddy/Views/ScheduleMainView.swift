@@ -8,8 +8,8 @@ import SwiftUI
 
 struct ScheduleMainView: View {
     enum Tab: String, CaseIterable {
-        case daily = "Harian"
-        case monthly = "Bulanan"
+        case daily = "Jadwal Kerja"
+        case monthly = "Jadwal Libur"
     }
     
     @State private var selectedTab: Tab = .daily
