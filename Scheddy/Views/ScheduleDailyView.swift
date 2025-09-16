@@ -76,18 +76,6 @@ struct ScheduleDailyView: View {
                 .task {
                     await viewModel.loadGeneratedSchedule()
                 }
-                .toolbar {
-                    if isEdit && !viewModel.hasSaved {
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Button("Cancel") {
-                                withAnimation(.spring()) {
-                                    isEdit = false
-                                    isStart = true
-                                }
-                            }
-                        }
-                    }
-                }
                 .alert("Yakin simpan jadwal caddy?", isPresented: $showSaveAlert) {
                     Button("OK", role: .cancel) {
                         isEdit.toggle()
@@ -122,20 +110,39 @@ struct ScheduleDailyView: View {
                     }
 
                     if isEdit && !viewModel.hasSaved {
-                        Button {
-                            withAnimation(.spring()) {
-                                showSaveAlert.toggle()
+                        HStack (spacing: 20) {
+                            Button {
+                                withAnimation(.spring()) {
+                                    showSaveAlert.toggle()
+                                }
+                            } label: {
+                                Text("Simpan Jadwal")
+                                    .font(.system(size: 22, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .padding(.horizontal, 80)
+                                    .background(Color.hijauMuda)
+                                    .clipShape(RoundedRectangle(cornerRadius: 30))
                             }
-                        } label: {
-                            Text("Simpan Jadwal")
-                                .font(.system(size: 22, weight: .bold))
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(Color.hijauMuda)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                        }
-                        .padding()
-                        .shadow(color: Color.black.opacity(0.1), radius: 3)
+                            .shadow(color: Color.black.opacity(0.1), radius: 3)
+                            
+                            Button {
+                                withAnimation(.spring()) {
+                                    isEdit = false
+                                    isStart = true
+                                }
+                            } label: {
+                                Text("Batal")
+                                    .font(.system(size: 22, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .padding(.horizontal, 120)
+                                    .background(Color.hijauMuda.opacity(0.7))
+                                    .clipShape(RoundedRectangle(cornerRadius: 30))
+                            }
+                            .shadow(color: Color.black.opacity(0.1), radius: 3)
+
+                        }.padding()
                     }
                 }
 

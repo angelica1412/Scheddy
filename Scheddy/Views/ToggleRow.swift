@@ -14,6 +14,7 @@ struct ToggleRow: View {
     var body: some View {
         InfoRowSheet(label: label) {
             Toggle("", isOn: $isOn)
+                .tint(Color.hijauMuda)
                 .labelsHidden()
                 .scaleEffect(0.9)
         }
