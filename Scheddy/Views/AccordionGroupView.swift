@@ -45,9 +45,9 @@ struct AccordionGroupView: View {
                     .padding(.horizontal, 12)
                     .padding(.trailing, isEdit ? 60 : 0)
                 }
-                .tint(.teal)
-                .buttonStyle(.borderedProminent)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.button)
+                                .cornerRadius(12)
 
                 Button {
                     // action edit

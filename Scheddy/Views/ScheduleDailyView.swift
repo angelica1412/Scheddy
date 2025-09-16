@@ -114,11 +114,11 @@ struct ScheduleDailyView: View {
                                 .font(.system(size: 22, weight: .bold))
                                 .foregroundColor(.white)
                                 .padding()
-                                .background(Color.teal)
+                                .background(Color.hijauMuda)
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
                         .padding()
-                        .shadow(radius: 15)
+                        .shadow(radius: 4)
                     }
 
                     if isEdit && !viewModel.hasSaved {
@@ -131,11 +131,11 @@ struct ScheduleDailyView: View {
                                 .font(.system(size: 22, weight: .bold))
                                 .foregroundColor(.white)
                                 .padding()
-                                .background(Color.teal)
+                                .background(Color.hijauMuda)
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
                         .padding()
-                        .shadow(radius: 15)
+                        .shadow(radius: 4)
                     }
                 }
 
