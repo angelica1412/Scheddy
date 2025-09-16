@@ -11,6 +11,8 @@ struct CheckOutView: View {
     @Environment(\.dismiss) var dismiss
     let caddyId: String
 
+    var onSuccess: (() async -> Void)? = nil
+
     @StateObject private var viewModel = CheckOutViewModel()
     @State private var selectedHole: Int? = nil
     @State private var showSuccessAlert = false
@@ -48,7 +50,12 @@ struct CheckOutView: View {
             }
         }
         .alert("Sukses", isPresented: $showSuccessAlert) {
-            Button("OK") { dismiss() }
+            Button("OK") {
+                Task {
+                    await onSuccess?()
+                    dismiss()
+                }
+            }
         }
         message: {
             Text(viewModel.successMessage ?? "")
@@ -155,7 +162,6 @@ struct CheckOutView: View {
     }
     
     private func hasUnsavedChanges() -> Bool {
-        // Consider a change if the user has selected a hole.
         if selectedHole != nil { return true }
         return false
     }

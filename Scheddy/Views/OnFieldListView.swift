@@ -22,40 +22,40 @@ struct OnFieldListView: View {
     private func hideCaddy(_ id: String) {
         hiddenCaddyIDs.insert(id)
     }
+    
+    // Helper untuk membuat instance Caddy ringkas (mengurangi beban type-checker)
+    private func makeCaddy(id: String, nama: String) -> Caddy {
+        Caddy(
+            id: id,
+            name: nama,
+            caddy_type: 0,
+            id_user: "",
+            id_caddy_group: "",
+            urutan: 0
+        )
+    }
+    
+    // Kelompok yang punya item (mengurangi ekspresi kompleks di body)
+    private var nonEmptyGroups: [CaddyGroupGeneric] {
+        groupedCaddies.filter { !$0.caddies.isEmpty }
+    }
 
     var body: some View {
         ZStack {
             ScrollView {
                 VStack(spacing: 12) {
-                    ForEach(groupedCaddies.filter { !$0.caddies.isEmpty }) { group in
+                    ForEach(nonEmptyGroups, id: \.id) { group in
                         CollapsibleGroup(title: group.nama) {
                             VStack(spacing: 12) {
-                                ForEach(group.caddies.filter { !hiddenCaddyIDs.contains($0.id) }) { caddy in
-                                    Button {
-                                        selectedCaddy = Caddy(
-                                            id: caddy.id,
-                                            name: caddy.nama,
-                                            caddy_type: 0,
-                                            id_user: "",
-                                            id_caddy_group: "",
-                                            urutan: 0
-                                        )
-                                    } label: {
-                                        CaddyRow(
-                                            caddy: Caddy(
-                                                id: caddy.id,
-                                                name: caddy.nama,
-                                                caddy_type: 0,
-                                                id_user: "",
-                                                id_caddy_group: "",
-                                                urutan: 0
-                                            )
-                                        )
+                                ForEach(group.caddies, id: \.id) { caddy in
+                                    if !hiddenCaddyIDs.contains(caddy.id) {
+                                        let compact = makeCaddy(id: caddy.id, nama: caddy.nama)
+                                        Button {
+                                            selectedCaddy = compact
+                                        } label: {
+                                            CaddyRow(caddy: compact)
+                                        }
                                     }
-                                    .buttonStyle(.plain)
-                                    .accessibilityLabel(Text(caddy.nama))
-                                    .accessibilityAddTraits(.isButton)
-                                    .accessibilityHint(Text("Ketuk dua kali untuk check-out caddy"))
                                 }
                             }
                             .padding(.horizontal)
