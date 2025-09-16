@@ -20,28 +20,30 @@ struct CheckOutView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                if let detail = viewModel.detail {
-                    content(for: detail)
-                } else {
-                    VStack {
-                        Spacer()
-                        ProgressView("Loading...")
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(12)
-                        Spacer()
+                ScrollView {
+                    if let detail = viewModel.detail {
+                        content(for: detail)
+                    } else {
+                        VStack {
+                            Spacer()
+                            ProgressView("Loading...")
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(12)
+                            Spacer()
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-            }
-            .navigationTitle("Check-Out")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Batal") {
-                        if hasUnsavedChanges() { showExitAlert = true } else { dismiss() }
+                .navigationTitle("Check-Out")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button("Batal") {
+                            if hasUnsavedChanges() { showExitAlert = true } else { dismiss() }
+                        }
+                        .foregroundColor(.hijauMuda)
                     }
-                    .foregroundColor(.hijauMuda)
                 }
             }
         }
@@ -75,7 +77,6 @@ struct CheckOutView: View {
                         .font(.body)
                         .foregroundColor(.black)
                 }
-                .padding(.vertical, 16)
 
                 // Player Name
                 InfoRowSheet(label: "Nama Pemain", showDivider: true) {
@@ -83,7 +84,6 @@ struct CheckOutView: View {
                         .font(.body)
                         .foregroundColor(.black)
                 }
-                .padding(.vertical, 16)
 
                 // Player ID
                 InfoRowSheet(label: "ID Pemain", showDivider: true) {
@@ -91,11 +91,9 @@ struct CheckOutView: View {
                         .font(.body)
                         .foregroundColor(.black)
                 }
-                .padding(.vertical, 16)
 
                 // Hole Selection
                 HolePicker(selection: $selectedHole)
-                    .padding(.vertical, 16)
 
                 // Caddy Request
                 InfoRowSheet(label: "Caddy Request", showDivider: true) {
@@ -103,7 +101,6 @@ struct CheckOutView: View {
                         .font(.body)
                         .foregroundColor(.black)
                 }
-                .padding(.vertical, 16)
 
                 // Bag Items (read-only, with its own separators)
                 BagItemsReadOnly(
@@ -121,6 +118,7 @@ struct CheckOutView: View {
                 }
             }
             .padding(.horizontal, 20)
+            .padding(.top, 20)
             
             Spacer(minLength: 20)
             
